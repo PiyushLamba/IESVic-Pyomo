@@ -1,0 +1,8 @@
+Model duals:
+
+dual : Direction=Suffix.IMPORT_EXPORT, Datatype=Suffix.FLOAT
+    Key : Value
+
+Constraint slacks:
+
+Constraint || Lower Slack || Upper Slack
