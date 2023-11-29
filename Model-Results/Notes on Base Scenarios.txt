@@ -1,0 +1,98 @@
+* 24 hours:
+
+- 1 Season / 1 Day type (1 day in day type):
+
+Discounted values: 
+Discounted system costs (total costs), 70.64351265414005
+Disounted generator capital costs, 0.0
+Disounted generator fixed costs, 62.10265597354325
+Disounted generator variable costs, 0.9524903703984278
+Disounted generator emissions costs, 0.0
+Discounted generator salvage value, 0.0
+Disounted storage capital costs, 0.0
+Discounted storage salvage value, 0.0
+
+Non-discounted values: 
+Non-discounted system costs (total costs), 81.43809542373798
+Non-disounted generator capital costs, 0.0
+Non-disounted generator fixed costs, 71.59946927212071
+Non-disounted generator variable costs, 1.0913968439847885
+Non-disounted generator emissions costs, 0.0
+Non-discounted generator salvage value, 0.0
+Non-disounted storage capital costs, 0.0
+Non-discounted storage salvage value, 0.0
+
+-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+
+- 3 Seasons / 1 Day type (1 day in day type):
+
+Discounted values: 
+Discounted system costs (total costs), 91.68879368533466
+Disounted generator capital costs, 53.754514825058514
+Disounted generator fixed costs, 62.54792924000159
+Disounted generator variable costs, 1.132189673536016
+Disounted generator emissions costs, 0.0
+Discounted generator salvage value, 36.041359628856675
+Disounted storage capital costs, 0.0
+Discounted storage salvage value, 0.0
+
+Non-discounted values: 
+Non-discounted system costs (total costs), 90.85984397877225
+Non-disounted generator capital costs, 53.75451482505851
+Non-disounted generator fixed costs, 72.1218172701223
+Non-disounted generator variable costs, 1.2952873302408172
+Non-disounted generator emissions costs, 0.0
+Non-discounted generator salvage value, 48.23146930681597
+Non-disounted storage capital costs, 0.0
+Non-discounted storage salvage value, 0.0
+
+
+#################################################################################################################################################################
+
+* 48 hours:
+
+- 1 Season / 1 Day type (1 day in day type):
+
+Discounted values: 
+Discounted system costs (total costs), 77.27435593847592
+Disounted generator capital costs, 16.74287517921495
+Disounted generator fixed costs, 62.32404020335883
+Disounted generator variable costs, 1.0652921871555856
+Disounted generator emissions costs, 0.0
+Discounted generator salvage value, 11.225773081926217
+Disounted storage capital costs, 0.0
+Discounted storage salvage value, 0.0
+
+Non-discounted values: 
+Non-discounted system costs (total costs), 84.45843965413808
+Non-disounted generator capital costs, 16.742875179214952
+Non-disounted generator fixed costs, 71.85331350290596
+Non-disounted generator variable costs, 1.2186930735918098
+Non-disounted generator emissions costs, 0.0
+Non-discounted generator salvage value, 15.022616666567224
+Non-disounted storage capital costs, 0.0
+Non-discounted storage salvage value, 0.0
+
+-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-
+
+- 3 Seasons/ 1 Day type (1 day in day type):
+
+Discounted values: 
+Discounted system costs (total costs), 131.6701240788661
+Disounted generator capital costs, 156.42486852625098
+Disounted generator fixed costs, 62.8702354645492
+Disounted generator variable costs, 1.3983408965682054
+Disounted generator emissions costs, 0.0
+Discounted generator salvage value, 104.879840508264
+Disounted storage capital costs, 0.0
+Discounted storage salvage value, 0.0
+
+Non-discounted values: 
+Non-discounted system costs (total costs), 108.6113950049668
+Non-disounted generator capital costs, 156.42486852625098
+Non-disounted generator fixed costs, 72.49633995358462
+Non-disounted generator variable costs, 1.599711502327374
+Non-disounted generator emissions costs, 0.0
+Non-discounted generator salvage value, 140.352885142767
+Non-disounted storage capital costs, 0.0
+Non-discounted storage salvage value, 0.0
