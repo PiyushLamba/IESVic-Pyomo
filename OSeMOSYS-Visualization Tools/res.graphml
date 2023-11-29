@@ -1,0 +1,573 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key attr.name="Demand" attr.type="double" for="edge" id="d13" />
+  <key attr.name="xlabel" attr.type="string" for="edge" id="d12" />
+  <key attr.name="ouput_ratio" attr.type="double" for="edge" id="d11" />
+  <key attr.name="input_ratio" attr.type="double" for="edge" id="d10" />
+  <key attr.name="emission_ratio" attr.type="double" for="edge" id="d9" />
+  <key attr.name="dir" attr.type="string" for="edge" id="d8" />
+  <key attr.name="output_ratio" attr.type="double" for="edge" id="d7" />
+  <key attr.name="width" attr.type="double" for="node" id="d6" />
+  <key attr.name="height" attr.type="double" for="node" id="d5" />
+  <key attr.name="label" attr.type="string" for="node" id="d4" />
+  <key attr.name="style" attr.type="string" for="node" id="d3" />
+  <key attr.name="shape" attr.type="string" for="node" id="d2" />
+  <key attr.name="fillcolor" attr.type="string" for="node" id="d1" />
+  <key attr.name="type" attr.type="string" for="node" id="d0" />
+  <graph edgedefault="directed">
+    <node id="BACKSTOP1">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">BACKSTOP1</data>
+    </node>
+    <node id="BACKSTOP2">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">BACKSTOP2</data>
+    </node>
+    <node id="ETHPLANT">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">ETHPLANT</data>
+    </node>
+    <node id="GAS_EXTRACTION">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">GAS_EXTRACTION</data>
+    </node>
+    <node id="GAS_IMPORT">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">GAS_IMPORT</data>
+    </node>
+    <node id="GRID_EXP">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">GRID_EXP</data>
+    </node>
+    <node id="HYD1">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">HYD1</data>
+    </node>
+    <node id="HYD2">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">HYD2</data>
+    </node>
+    <node id="IMPDSL">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">IMPDSL</data>
+    </node>
+    <node id="IMPFERT">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">IMPFERT</data>
+    </node>
+    <node id="IMPRAWSUG">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">IMPRAWSUG</data>
+    </node>
+    <node id="LNDFORCOV">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">LNDFORCOV</data>
+    </node>
+    <node id="LNDRES">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">LNDRES</data>
+    </node>
+    <node id="LNDSUGPL">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">LNDSUGPL</data>
+    </node>
+    <node id="LNDSUGPLIR">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">LNDSUGPLIR</data>
+    </node>
+    <node id="LNDSUGPLRF">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">LNDSUGPLRF</data>
+    </node>
+    <node id="NGCC">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">NGCC</data>
+    </node>
+    <node id="RIVER">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">RIVER</data>
+    </node>
+    <node id="RIVER_2">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">RIVER_2</data>
+    </node>
+    <node id="RIVWATAGR">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">RIVWATAGR</data>
+    </node>
+    <node id="SOLPV1">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">SOLPV1</data>
+    </node>
+    <node id="SOLPV2">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">SOLPV2</data>
+    </node>
+    <node id="SUGFACTORY">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">SUGFACTORY</data>
+    </node>
+    <node id="TD">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">TD</data>
+    </node>
+    <node id="TD2">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">TD2</data>
+    </node>
+    <node id="WINDPOWER">
+      <data key="d0">technology</data>
+      <data key="d1">yellow</data>
+      <data key="d2">rectangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">WINDPOWER</data>
+    </node>
+    <node id="DAM">
+      <data key="d0">storage</data>
+      <data key="d1">lightblue</data>
+      <data key="d2">triangle</data>
+      <data key="d3">filled</data>
+      <data key="d4">DAM</data>
+    </node>
+    <node id="BAGASSE">
+      <data key="d0">fuel</data>
+      <data key="d3">filled</data>
+      <data key="d2">circle</data>
+      <data key="d5">0.1</data>
+      <data key="d6">0.1</data>
+      <data key="d4" />
+    </node>
+    <node id="DSL">
+      <data key="d0">fuel</data>
+      <data key="d3">filled</data>
+      <data key="d2">circle</data>
+      <data key="d5">0.1</data>
+      <data key="d6">0.1</data>
+      <data key="d4" />
+    </node>
+    <node id="ETH">
+      <data key="d0">fuel</data>
+      <data key="d3">filled</data>
+      <data key="d2">circle</data>
+      <data key="d5">0.1</data>
+      <data key="d6">0.1</data>
+      <data key="d4" />
+    </node>
+    <node id="FEL1">
+      <data key="d0">fuel</data>
+      <data key="d3">filled</data>
+      <data key="d2">circle</data>
+      <data key="d5">0.1</data>
+      <data key="d6">0.1</data>
+      <data key="d4" />
+    </node>
+    <node id="FEL2">
+      <data key="d0">fuel</data>
+      <data key="d3">filled</data>
+      <data key="d2">circle</data>
+      <data key="d5">0.1</data>
+      <data key="d6">0.1</data>
+      <data key="d4" />
+    </node>
+    <node id="FER">
+      <data key="d0">fuel</data>
+      <data key="d3">filled</data>
+      <data key="d2">circle</data>
+      <data key="d5">0.1</data>
+      <data key="d6">0.1</data>
+      <data key="d4" />
+    </node>
+    <node id="GAS">
+      <data key="d0">fuel</data>
+      <data key="d3">filled</data>
+      <data key="d2">circle</data>
+      <data key="d5">0.1</data>
+      <data key="d6">0.1</data>
+      <data key="d4" />
+    </node>
+    <node id="LAND">
+      <data key="d0">fuel</data>
+      <data key="d3">filled</data>
+      <data key="d2">circle</data>
+      <data key="d5">0.1</data>
+      <data key="d6">0.1</data>
+      <data key="d4" />
+    </node>
+    <node id="LANDFOREST">
+      <data key="d0">fuel</data>
+      <data key="d3">filled</data>
+      <data key="d2">circle</data>
+      <data key="d5">0.1</data>
+      <data key="d6">0.1</data>
+      <data key="d4" />
+    </node>
+    <node id="LNDSUGCAN">
+      <data key="d0">fuel</data>
+      <data key="d3">filled</data>
+      <data key="d2">circle</data>
+      <data key="d5">0.1</data>
+      <data key="d6">0.1</data>
+      <data key="d4" />
+    </node>
+    <node id="MOLASSES">
+      <data key="d0">fuel</data>
+      <data key="d3">filled</data>
+      <data key="d2">circle</data>
+      <data key="d5">0.1</data>
+      <data key="d6">0.1</data>
+      <data key="d4" />
+    </node>
+    <node id="RAWSUG">
+      <data key="d0">fuel</data>
+      <data key="d3">filled</data>
+      <data key="d2">circle</data>
+      <data key="d5">0.1</data>
+      <data key="d6">0.1</data>
+      <data key="d4" />
+    </node>
+    <node id="RIVERWATER">
+      <data key="d0">fuel</data>
+      <data key="d3">filled</data>
+      <data key="d2">circle</data>
+      <data key="d5">0.1</data>
+      <data key="d6">0.1</data>
+      <data key="d4" />
+    </node>
+    <node id="SEC_EL">
+      <data key="d0">fuel</data>
+      <data key="d3">filled</data>
+      <data key="d2">circle</data>
+      <data key="d5">0.1</data>
+      <data key="d6">0.1</data>
+      <data key="d4" />
+    </node>
+    <node id="SUGCAN">
+      <data key="d0">fuel</data>
+      <data key="d3">filled</data>
+      <data key="d2">circle</data>
+      <data key="d5">0.1</data>
+      <data key="d6">0.1</data>
+      <data key="d4" />
+    </node>
+    <node id="WATAGR">
+      <data key="d0">fuel</data>
+      <data key="d3">filled</data>
+      <data key="d2">circle</data>
+      <data key="d5">0.1</data>
+      <data key="d6">0.1</data>
+      <data key="d4" />
+    </node>
+    <node id="WATIN">
+      <data key="d0">fuel</data>
+      <data key="d3">filled</data>
+      <data key="d2">circle</data>
+      <data key="d5">0.1</data>
+      <data key="d6">0.1</data>
+      <data key="d4" />
+    </node>
+    <node id="CO2">
+      <data key="d0">emission</data>
+      <data key="d1">grey</data>
+      <data key="d2">circle</data>
+      <data key="d3">filled</data>
+      <data key="d4">CO2</data>
+    </node>
+    <node id="AnnualDemand">
+      <data key="d0">demand</data>
+      <data key="d1">green</data>
+      <data key="d4">AccumulatedAnnualDemand</data>
+      <data key="d3">filled</data>
+    </node>
+    <edge source="BACKSTOP1" target="FEL1">
+      <data key="d7">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="BACKSTOP2" target="FEL2">
+      <data key="d7">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="ETHPLANT" target="ETH">
+      <data key="d7">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="GAS_EXTRACTION" target="GAS">
+      <data key="d7">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="GAS_EXTRACTION" target="CO2">
+      <data key="d9">0.05</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="GAS_IMPORT" target="GAS">
+      <data key="d7">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="GAS_IMPORT" target="CO2">
+      <data key="d9">0.05</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="GRID_EXP" target="FEL2">
+      <data key="d7">0.82</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="HYD1" target="SEC_EL">
+      <data key="d7">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="HYD2" target="FEL1">
+      <data key="d7">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="HYD2" target="DAM">
+      <data key="d10">0.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="IMPDSL" target="DSL">
+      <data key="d7">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="IMPDSL" target="CO2">
+      <data key="d9">0.05</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="IMPFERT" target="FER">
+      <data key="d7">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="IMPRAWSUG" target="RAWSUG">
+      <data key="d7">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="LNDFORCOV" target="LANDFOREST">
+      <data key="d7">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="LNDRES" target="LAND">
+      <data key="d7">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="LNDSUGPL" target="LNDSUGCAN">
+      <data key="d7">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="LNDSUGPLIR" target="SUGCAN">
+      <data key="d7">0.047</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="LNDSUGPLRF" target="SUGCAN">
+      <data key="d7">0.0376</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="NGCC" target="SEC_EL">
+      <data key="d7">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="RIVER" target="RIVERWATER">
+      <data key="d7">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="RIVER_2" target="WATIN">
+      <data key="d7">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="RIVWATAGR" target="WATAGR">
+      <data key="d7">0.9</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="SOLPV1" target="FEL2">
+      <data key="d7">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="SOLPV2" target="FEL2">
+      <data key="d7">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="SUGFACTORY" target="BAGASSE">
+      <data key="d7">16.2</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="SUGFACTORY" target="MOLASSES">
+      <data key="d7">0.34</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="SUGFACTORY" target="RAWSUG">
+      <data key="d7">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="TD" target="FEL1">
+      <data key="d7">0.95</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="WINDPOWER" target="SEC_EL">
+      <data key="d7">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="DAM" target="HYD2">
+      <data key="d11">1.0</data>
+      <data key="d8">none</data>
+    </edge>
+    <edge source="DSL" target="LNDSUGPLIR">
+      <data key="d10">0.021131999999999998</data>
+      <data key="d12">DSL</data>
+    </edge>
+    <edge source="DSL" target="LNDSUGPLRF">
+      <data key="d10">0.021131999999999998</data>
+      <data key="d12">DSL</data>
+    </edge>
+    <edge source="ETH" target="AnnualDemand">
+      <data key="d13">2.157</data>
+      <data key="d12">ETH</data>
+    </edge>
+    <edge source="FEL1" target="ETHPLANT">
+      <data key="d10">0.0251</data>
+      <data key="d12">FEL1</data>
+    </edge>
+    <edge source="FEL1" target="LNDSUGPLIR">
+      <data key="d10">0.000515</data>
+      <data key="d12">FEL1</data>
+    </edge>
+    <edge source="FEL1" target="AnnualDemand">
+      <data key="d13">4.273</data>
+      <data key="d12">FEL1</data>
+    </edge>
+    <edge source="FEL2" target="AnnualDemand">
+      <data key="d13">2.05</data>
+      <data key="d12">FEL2</data>
+    </edge>
+    <edge source="FER" target="LNDSUGPLIR">
+      <data key="d10">6.4e-05</data>
+      <data key="d12">FER</data>
+    </edge>
+    <edge source="FER" target="LNDSUGPLRF">
+      <data key="d10">6.4e-05</data>
+      <data key="d12">FER</data>
+    </edge>
+    <edge source="GAS" target="NGCC">
+      <data key="d10">1.992</data>
+      <data key="d12">GAS</data>
+    </edge>
+    <edge source="LAND" target="LNDFORCOV">
+      <data key="d10">1.0</data>
+      <data key="d12">LAND</data>
+    </edge>
+    <edge source="LAND" target="LNDSUGPL">
+      <data key="d10">1.0</data>
+      <data key="d12">LAND</data>
+    </edge>
+    <edge source="LNDSUGCAN" target="LNDSUGPLIR">
+      <data key="d10">1.0</data>
+      <data key="d12">LNDSUGCAN</data>
+    </edge>
+    <edge source="LNDSUGCAN" target="LNDSUGPLRF">
+      <data key="d10">1.0</data>
+      <data key="d12">LNDSUGCAN</data>
+    </edge>
+    <edge source="MOLASSES" target="ETHPLANT">
+      <data key="d10">0.1519</data>
+      <data key="d12">MOLASSES</data>
+    </edge>
+    <edge source="RAWSUG" target="AnnualDemand">
+      <data key="d13">0.75</data>
+      <data key="d12">RAWSUG</data>
+    </edge>
+    <edge source="RIVERWATER" target="HYD2">
+      <data key="d10">10.0</data>
+      <data key="d12">RIVERWATER</data>
+    </edge>
+    <edge source="SEC_EL" target="GRID_EXP">
+      <data key="d10">1.0</data>
+      <data key="d12">SEC_EL</data>
+    </edge>
+    <edge source="SEC_EL" target="TD">
+      <data key="d10">1.0</data>
+      <data key="d12">SEC_EL</data>
+    </edge>
+    <edge source="SUGCAN" target="SUGFACTORY">
+      <data key="d10">7.52</data>
+      <data key="d12">SUGCAN</data>
+    </edge>
+    <edge source="WATAGR" target="LNDSUGPLIR">
+      <data key="d10">0.634</data>
+      <data key="d12">WATAGR</data>
+    </edge>
+    <edge source="WATIN" target="RIVWATAGR">
+      <data key="d10">1.0</data>
+      <data key="d12">WATIN</data>
+    </edge>
+  </graph>
+</graphml>
