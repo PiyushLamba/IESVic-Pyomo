@@ -1,0 +1,2276 @@
+#																																																													
+#	"To run the model, copy and paste the following line into the command prompt, after replacing ...FILEPATH... with your folder structure."																																																												
+#																																																													
+#   C:\...FILEPATH...\glpsol -m C:\...FILEPATH...\OSeMOSYS_2013_05_10.mod -d C:\...FILEPATH...\UTOPIA_2013_05_10.dat -o C:\...FILEPATH...\UTOPIA-Results.txt                           																																																													
+#																																																													
+#  Alternatively, install GUSEK (http://gusek.sourceforge.net/gusek.html) and run the model within this integrated development environment (IDE). 																																																													
+#  To do so, open the .dat file within GUSEK and select ""Use External .dat file"" from the Options menu. Then go to the .mod file and select the ""Go"" icon or press F5.																																																													
+#																																																													
+#	Based on UTOPIA version 5: BASE - Utopia Base Model																																																												
+#	Energy and demands in TWh																																																												
+#	Power plants in GW																																																												
+#	Investment and Fixed O&M Costs: Power plant: Million $ / GW (//$/kW)																																																												
+#	Other plant costs: Million $/TWh/a																																																												
+#	Variable O&M (& Import) Costs: Million $ / TWh (//$/MWh)																																																												
+#																																																													
+#****************************************																																																													
+param	AnnualExogenousEmission			default	0		:=	;																																																					
+param	AnnualEmissionLimit				default	9999	:=	
+[*,IMPORTS,*]		:		2015:=
+BC							0;																																																		
+param	ModelPeriodExogenousEmission	default	0		:=	;																																																							
+param	ModelPeriodEmissionLimit		default	9999	:=	;																																																							
+#****************************************																																																													
+set	EMISSION			:=	CO2		CO2c	IMPORTS;																																																							
+set	TECHNOLOGY			:=	GMSPC 	MICARVL	SITEC 	HYDRO	PCOAL	COALCCS	SCGT	CCGT	COGEN	CCGTCCS	NUCLR	WIND	SOLAR	GEOTHERM	BIOMASS	TX1	TX2	USTRADEJJ	USTRADEJD	MILLGEN	DEBRISGEN	IMPCOAL	IMPGAS	;																																															
+set	FUEL				:=	ELEC	PHD		PrimReserveUp	SecReserveUp	PrimReserveDown	SecReserveDown	TXELEC	TXPHD	TXRAMP	TXRESERV	MIDC	COAL	GAS		MILLWASTE	DEBRIS;																																																							
+set	YEAR				:=	2015;
+set	TIMESLICE			:=	DJFNGHTRG	DJFMRNGRG	DJFMIDYRG	DJFEVNGRG	DJFNGHTPK	DJFMRNGPK	DJFMIDYPK	DJFEVNGPK	MAMNGHTRG	MAMMRNGRG	MAMMIDYRG	MAMEVNGRG	MAMNGHTPK	MAMMRNGPK	MAMMIDYPK	MAMEVNGPK	JJANGHTRG	JJAMRNGRG	JJAMIDYRG	JJAEVNGRG	JJANGHTPK	JJAMRNGPK	JJAMIDYPK	JJAEVNGPK	SONNGHTRG	SONMRNGRG	SONMIDYRG	SONEVNGRG	SONNGHTPK	SONMRNGPK	SONMIDYPK	SONEVNGPK	;
+set	MODE_OF_OPERATION	:=	1	2 	3	4	5	6	7	8;																																																									
+set	REGION				:=	BC	AB;
+set RESERVOIR			:=	WLSTN	CLMBIA	CRES;																																																						
+#																																																													
+#  SEASON (Use consecutive numbers only, i.e, 1,2,3,4!, e.g., 1 = winter, 2 = spring, 3 = summer, 4 = autumn. The seasons with the higher number follow those with lower numbers.) 																																																													
+#  Note: in the UTOPIA case, energy is not stored from one season to another. Rather, the available capacity is assumed to be infinite. Therefore, it can be assumed that the intermediate season is between winter and summer without any consequences for the model results (and not both, between winter and summer, and between summer and winter)."																																																													
+set SEASON	:=	1 	2	3	4;																																																											
+#																																																													
+#  DAYTYPE (Use consecutive numbers only, i.e, 1,2,3,4!, e.g., 1 = weekdays, 2 = weekends. The weekdays with the higher numbers follow those with lower numbers.)																																																												
+set DAYTYPE	:=	1	2;																																																										
+#																																																													
+#  DAILYTIMEBRACKET (Use consecutive numbers only, i.e, 1,2,3,4!, e.g., 1 = first hour of day, 2 = 2nd hour of day, etc. The time brackets with the higher numbers follow those with lower numbers)																																																													
+set DAILYTIMEBRACKET	:=	1	2	3	4;																																																											
+#																																																													
+set	STORAGE	:=	;																																																										
+#																																																													
+param DiscountRate default 0.06 :=;																																																													
+#																																																													
+# DepreciationMethod; equal to 1 for Sinking Fund and 2 for Straight Line Depreciation																																																													
+param DepreciationMethod default 1 :=;																																																													
+#										
+# ReserveMarginMethod; equal to 1 for reserve margin on production and 2 for reserve margin on demand
+param ReserveMarginMethod := 1;																																																			
+																																																													
+#																																																													
+param	YearSplit	:	2015	:=
+DJFNGHTPK			0.01039
+DJFMRNGPK			0.00594
+DJFMIDYPK			0.01039
+DJFEVNGPK			0.0089
+DJFNGHTRG			0.06153
+DJFMRNGRG			0.03516
+DJFMIDYRG			0.06153
+DJFEVNGRG			0.05274
+MAMNGHTPK			0.01039
+MAMMRNGPK			0.00594
+MAMMIDYPK			0.01039
+MAMEVNGPK			0.0089
+MAMNGHTRG			0.06313
+MAMMRNGRG			0.03607
+MAMMIDYRG			0.06313
+MAMEVNGRG			0.05411
+JJANGHTPK			0.01039
+JJAMRNGPK			0.00594
+JJAMIDYPK			0.01039
+JJAEVNGPK			0.0089
+JJANGHTRG			0.06313
+JJAMRNGRG			0.03607
+JJAMIDYRG			0.06313
+JJAEVNGRG			0.05411
+SONNGHTPK			0.01039
+SONMRNGPK			0.00594
+SONMIDYPK			0.01039
+SONEVNGPK			0.0089
+SONNGHTRG			0.06233
+SONMRNGRG			0.03562
+SONMIDYRG			0.06233
+SONEVNGRG			0.05342
+;
+#																																																													
+# DaySplit{lh in DAILYTIMEBRACKET, y in YEAR};																																																										
+# The length of one time bracket in one specific day as a fraction of the year, e.g., when distinguishing between days and night: 12h/(24h*365d)																																																												
+#Rows are time brackets (1 is night, 2 is morning, 3 is midday, 4 is evening)							
+#Cols are seasons (winter, spring, summer, fall)							
+param DaySplit default 0.002739 :=							
+[*,*]:			1	2	3	4	:=
+1			0.000799087	0.000799087	0.000799087	0.000799087	
+2			0.000456621	0.000456621	0.000456621	0.000456621	
+3			0.000799087	0.000799087	0.000799087	0.000799087	
+4			0.000684932	0.000684932	0.000684932	0.000684932	
+	
+;																
+#																																																													
+param	AccumulatedAnnualDemand	default	0	:=	;																																																								
+																																																													
+#	
+param	SpecifiedAnnualDemand	default	0	:=																																																		
+	[*,ELEC,*]	:	2015	:=
+#Annual growth				1.025	1.022	1.040	1.027	1.023	1.016	1.009	1.013	1.014	1.010	1.005	1.009	1.013	1.012	1.013	1.013	1.014	1.010	1.009	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	1.011	
+#BC 3/4 growth, 2015 actual start			55	56.011	56.948	58.657	59.841	60.884	61.611	62.006	62.603	63.252	63.721	63.969	64.424	65.053	65.641	66.305	66.953	67.632	68.162	68.626	69.211	69.800	70.393	70.991	71.594	72.202	72.820	73.436	74.063	74.695	75.331	75.971	76.616	77.265	77.924	78.588	79.256	79.928	80.610	81.296	81.987	82.687	83.392	84.100	84.813	85.535	86.267	86.997	87.736	88.486	89.239	
+#BC			60.38	61.86	63.24	65.77	67.54	69.11	70.21	70.81	71.72	72.71	73.43	73.81	74.51	75.48	76.39	77.42	78.43	79.49	80.32	81.05	81.97	82.9	83.84	84.79	85.75	86.72	87.71	88.7	89.71	90.73	91.76	92.8	93.85	94.91	95.99	97.08	98.18	99.29	100.42	101.56	102.71	103.88	105.06	106.25	107.45	108.67	109.91	111.15	112.41	113.69	114.98	
+BC			52.73
+#Annual growth				1.050	1.025	1.029	1.028	1.029	1.017	1.017	1.017	1.017	1.012	1.012	1.015	1.013	1.008	1.010	1.013	1.013	1.008	1.011	1.010	1.014	1.008	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	1.010	
+#AB			80.26	84.30	86.45	88.92	91.45	94.09	95.67	97.25	98.93	100.64	101.84	103.08	104.57	105.92	106.75	107.87	109.27	110.69	111.55	112.78	113.94	115.51	116.47	117.63	118.81	120.00	121.20	122.41	123.63	124.87	126.12	127.38	128.65	129.94	131.24	132.55	133.88	135.22	136.57	137.93	139.31	140.71	142.11	143.53	144.97	146.42	147.88	149.36	150.86	152.36	153.89	
+AB			78.75	
+																																																						
+	[*,PHD,*]	:	2015	:=
+BC			2.274	
+AB			1.511
+;																																																						
+param	SpecifiedDemandProfile	default	0	:=																																																		
+	[BC,ELEC,*,*]	:	2015	:=
+DJFNGHTPK			0.01165 
+DJFMRNGPK			0.00678 
+DJFMIDYPK			0.01395 
+DJFEVNGPK			0.01239	
+DJFNGHTRG			0.06108 
+DJFMRNGRG			0.03486 
+DJFMIDYRG			0.07322 
+DJFEVNGRG			0.05397 
+MAMNGHTPK			0.01019 
+MAMMRNGPK			0.00599 
+MAMMIDYPK			0.01221 
+MAMEVNGPK			0.01039 
+MAMNGHTRG			0.05515 
+MAMMRNGRG			0.03077 
+MAMMIDYRG			0.06619	
+MAMEVNGRG			0.05544
+JJANGHTPK			0.00941	
+JJAMRNGPK			0.00507
+JJAMIDYPK			0.01179
+JJAEVNGPK			0.01036
+JJANGHTRG			0.05328
+JJAMRNGRG			0.03066
+JJAMIDYRG			0.06505	
+JJAEVNGRG			0.05551	
+SONNGHTPK			0.01149	
+SONMRNGPK			0.00670
+SONMIDYPK			0.01351	
+SONEVNGPK			0.01212
+SONNGHTRG			0.05280
+SONMRNGRG			0.02882
+SONMIDYRG			0.06454
+SONEVNGRG			0.05464
+																																																						
+																																																						
+	[BC,PHD,*,*]	:	2015	:=
+DJFNGHTPK			0.00946
+DJFMRNGPK			0.00982
+DJFMIDYPK			0.00473
+DJFEVNGPK			0.00519
+DJFNGHTRG			0.05774
+DJFMRNGRG			0.05977	
+DJFMIDYRG			0.02885
+DJFEVNGRG			0.04643
+MAMNGHTPK			0.00818
+MAMMRNGPK			0.00961	
+MAMMIDYPK			0.00461
+MAMEVNGPK			0.00442
+MAMNGHTRG			0.05865
+MAMMRNGRG			0.06272
+MAMMIDYRG			0.03433
+MAMEVNGRG			0.03624
+JJANGHTPK			0.00836	
+JJAMRNGPK			0.00507
+JJAMIDYPK			0.00316
+JJAEVNGPK			0.00249
+JJANGHTRG			0.05507
+JJAMRNGRG			0.03819	
+JJAMIDYRG			0.03235	
+JJAEVNGRG			0.03471
+SONNGHTPK			0.00826
+SONMRNGPK			0.00975	
+SONMIDYPK			0.00537
+SONEVNGPK			0.00463
+SONNGHTRG			0.09465
+SONMRNGRG			0.10402	
+SONMIDYRG			0.07088
+SONEVNGRG			0.08227	
+																																																						
+	[AB,ELEC,*,*]	:	2015	:=
+DJFNGHTPK			0.01074	
+DJFMRNGPK			0.00643
+DJFMIDYPK			0.01196
+DJFEVNGPK			0.01055	
+DJFNGHTRG			0.06150	
+DJFMRNGRG			0.03634
+DJFMIDYRG			0.06805	
+DJFEVNGRG			0.05848	
+MAMNGHTPK			0.01024
+MAMMRNGPK			0.00622
+MAMMIDYPK			0.01149
+MAMEVNGPK			0.00980	
+MAMNGHTRG			0.05627	
+MAMMRNGRG			0.03276
+MAMMIDYRG			0.06301
+MAMEVNGRG			0.05258
+JJANGHTPK			0.00991
+JJAMRNGPK			0.00572
+JJAMIDYPK			0.01165
+JJAEVNGPK			0.00988
+JJANGHTRG			0.05760
+JJAMRNGRG			0.03302
+JJAMIDYRG			0.06571
+JJAEVNGRG			0.05477
+SONNGHTPK			0.01026
+SONMRNGPK			0.00621
+SONMIDYPK			0.01147
+SONEVNGPK			0.01010
+SONNGHTRG			0.05639	
+SONMRNGRG			0.03338
+SONMIDYRG			0.06393
+SONEVNGRG			0.05359	
+																																																						
+																																																						
+	[AB,PHD,*,*]	:	2015	:=
+DJFNGHTPK			0.00768	
+DJFMRNGPK			0.00729
+DJFMIDYPK			0.00355
+DJFEVNGPK			0.00458
+DJFNGHTRG			0.05640	
+DJFMRNGRG			0.06496
+DJFMIDYRG			0.04009	
+DJFEVNGRG			0.05242
+MAMNGHTPK			0.00902	
+MAMMRNGPK			0.00696
+MAMMIDYPK			0.00423	
+MAMEVNGPK			0.00650
+MAMNGHTRG			0.06288
+MAMMRNGRG			0.07213
+MAMMIDYRG			0.04704
+MAMEVNGRG			0.05264
+JJANGHTPK			0.00952
+JJAMRNGPK			0.00781
+JJAMIDYPK			0.00356
+JJAEVNGPK			0.00429
+JJANGHTRG			0.06267
+JJAMRNGRG			0.05300
+JJAMIDYRG			0.04704	
+JJAEVNGRG			0.05744
+SONNGHTPK			0.00692	
+SONMRNGPK			0.00646
+SONMIDYPK			0.00341
+SONEVNGPK			0.00503	
+SONNGHTRG			0.06183
+SONMRNGRG			0.06766
+SONMIDYRG			0.04046
+SONEVNGRG			0.06451
+;																																																						
+												
+															
+#															
+param	CapacityToActivityUnit	default	8.76	:=	;										
+															
+#															
+param	TechWithCapacityNeededToMeetPeakTS	default	1	:=	;										
+															
+#															
+param SharedTechnology default 0	:=														
+	[BC,AB,*,*]	:			2015:=
+TX1							1		
+TX2							1				
+;	
+														
+#																																																													
+param	InputActivityRatio	default	0 :=																																																			
+#Trade parameters for energy																																																						
+#Mode 1 is imports. Mode 2 is exports																																																						
+	[BC,*,TXELEC,1,*]	:	2015	:=
+TX1			1		
+TX2			1		
+	[AB,*,TXELEC,1,*]	:	2015	:=
+TX1			1		
+TX2			1		
+	[BC,*,ELEC,5,*]	:	2015	:=
+TX1			1.01	
+TX2			1.015		
+USTRADEJJ			1		
+USTRADEJD			1		
+	[AB,*,ELEC,5,*]	:	2015	:=
+TX1			1.01		
+TX2			1.015	
+	[BC,*,MIDC,1,*]	:	2015	:=
+USTRADEJJ			1		
+USTRADEJD			1		
+																																																						
+#Trade parameters for peak hour demand																																																						
+																																																						
+	[BC,*,TXPHD,2,*]	:	2015	:=
+TX1			0.168	
+TX2			0.17	
+	[AB,*,TXPHD,2,*]	:	2015	:=
+TX1			0.168	
+TX2			0.17	
+	[BC,*,PHD,6,*]	:	2015	:=
+TX1			0.166	
+TX2			0.166	
+	[AB,*,PHD,6,*]	:	2015	:=
+TX1			0.166	
+TX2			0.166	
+																																																						
+#Trade parameters for ramping																																																						
+#TXRAMP is the transmission version of PrimReserveUp																																																						
+	[BC,*,TXRAMP,3,*]	:	2015	:=
+TX1			1.01	
+TX2			1.015	
+	[AB,*,TXRAMP,3,*]	:	2015	:=
+TX1			1.01	
+TX2			1.015	
+	[BC,*,TXELEC,3,*]	:	2015	:=
+TX1			0.18	
+TX2			0.18	
+	[AB,*,TXELEC,3,*]	:	2015	:=
+TX1			0.11	
+TX2			0.11	
+
+	[BC,*,PrimReserveUp,7,*]	:	2015	:=
+TX1			1		
+TX2			1		
+	[AB,*,PrimReserveUp,7,*]	:	2015	:=
+TX1			1		
+TX2			1		
+	[BC,*,ELEC,7,*]	:	2015	:=
+TX1			0.18		
+TX2			0.18		
+	[AB,*,ELEC,7,*]	:	2015	:=
+TX1			0.11		
+TX2			0.11		
+	
+#Trade parameters for ramping																																																						
+#TXRAMP is the transmission version of PrimReserveUp																																																						
+	[BC,*,TXRESERV,4,*]	:	2015	:=
+TX1			1.01		
+TX2			1.015		
+	[AB,*,TXRESERV,4,*]	:	2015	:=
+TX1			1.01	
+TX2			1.015	
+	[BC,*,TXELEC,4,*]	:	2015	:=
+TX1			0.47	
+TX2			0.47	
+	[AB,*,TXELEC,4,*]	:	2015	:=
+TX1			0.47
+TX2			0.47	
+	
+	[BC,*,SecReserveUp,8,*]	:	2015	:=
+TX1			1		
+TX2			1		
+	[AB,*,SecReserveUp,8,*]	:	2015	:=
+TX1			1		
+TX2			1		
+	[BC,*,ELEC,8,*]	:	2015	:=
+TX1			0.47		
+TX2			0.47		
+	[AB,*,ELEC,8,*]	:	2015	:=
+TX1			0.47		
+TX2			0.47		
+	
+#Inputs for energy																																																						
+	[BC,*,GAS,1,*]	:	2015	:=
+#Conv. Turbine to 2030, adv. turbine in 2030, nth of a kind adv turbine in 2050																																																						
+SCGT			10.8		
+#Conv. CC to 2030, adv. CC in 2030, nth of a kind adv CC in 2050																																																						
+CCGT			7.05		
+CCGTCCS			7.53		
+	[BC,*,COAL,1,*]	:	2015	:=
+#nth of a kind heatrate in 2050																																																						
+COALCCS			10.7	
+PCOAL			8.8	
+																																																						
+	[AB,*,GAS,1,*]	:	2015	:=
+#Conv. Turbine to 2030, adv. turbine in 2030, nth of a kind adv turbine in 2050																																																						
+SCGT			10.8	
+#Conv. CC to 2030, adv. CC in 2030, nth of a kind adv CC in 2050																																																						
+CCGT			7.05	
+CCGTCCS			7.53	
+#Cogen is 75% of CCGT fuel use																																																						
+COGEN			5.29
+	[AB,*,COAL,1,*]	:	2015	:=
+#nth of a kind heatrate in 2050																																																						
+COALCCS			10.7	
+PCOAL			8.8	
+																																																						
+#Inputs for peak hour demand																																																						
+#1/6 input to go with 1/6 output. Require 6x as much capacity per unit energy																																																						
+	[BC,*,GAS,2,*]	:	2015	:=
+SCGT			1.80
+CCGT			1.18	
+CCGTCCS			1.26	
+	[AB,*,GAS,2,*]	:	2015	:=
+SCGT			1.80
+CCGT			1.18	
+CCGTCCS			1.26	
+																																																						
+#150% of the energy % normal																																																						
+#Inputs for ramping																																																						
+	[BC,*,GAS,3,*]	:	2015	:=
+SCGT			2.92	
+CCGT			1.90		
+CCGTCCS			2.03		
+	[AB,*,GAS,3,*]	:	2015	:=
+SCGT			2.92		
+CCGT			1.90		
+CCGTCCS			2.03	
+																																																						
+	[BC,*,COAL,3,*]	:	2015	:=
+COALCCS			2.89	
+PCOAL			2.38		
+	[AB,*,COAL,3,*]	:	2015	:=
+COALCCS			2.89		
+PCOAL			2.38		
+																																																						
+#Inputs for regulation																																																						
+#150% of the energy % normal																																																						
+	[BC,*,GAS,4,*]	:	2015	:=
+SCGT			7.61		
+CCGT			4.97		
+CCGTCCS			5.31		
+	[AB,*,GAS,4,*]	:	2015	:=
+SCGT			7.61		
+CCGT			4.97		
+CCGTCCS			5.31		
+																																																						
+	[BC,*,COAL,4,*]	:	2015	:=
+COALCCS			7.54		
+PCOAL			6.20		
+	[AB,*,COAL,4,*]	:	2015	:=
+COALCCS			7.54		
+PCOAL			6.20		
+																																																						
+#Biomass inputs by mode of operation																																																						
+	[BC,BIOMASS,MILLWASTE,*,*]	:	2015	:=
+1			1		
+2			0.16		
+3			0.27		
+4			0.71		
+																																																						
+	[BC,BIOMASS,DEBRIS,*,*]	:	2015	:=
+5			1		
+6			0.16		
+7			0.27		
+8			0.71	
+																																																						
+																																																						
+	[AB,BIOMASS,MILLWASTE,*,*]	:	2015	:=
+1			1	
+2			0.16		
+3			0.27		
+4			0.71		
+																																																						
+	[AB,BIOMASS,DEBRIS,*,*]	:	2015	:=
+5			1		
+6			0.16		
+7			0.27	
+8			0.71	
+																																																						
+	[BC,*,PrimReserveUp,1,*]	:	2015	:=
+#Assumed 7% of capacity at 33% CF																																																						
+WIND			0.21		
+#Assumed 7% of capacity at 16%CF																																																						
+SOLAR			0.42		
+																																																						
+#Has to be based on energy, not capacity, because of how osemosys works																																																						
+	[BC,*,SecReserveUp,1,*]	:	2015	:=
+#Assumed 1% of capacity at 33% CF																																																						
+WIND			0.03		
+#Assumed 1% of capacity at 16%CF																																																						
+SOLAR			0.06		
+																																																						
+	[AB,*,SecReserveUp,1,*]	:	2015	:=
+#Assumed 1% of capacity at 33% CF																																																						
+WIND			0.03		
+#Assumed 1% of capacity at 16%CF																																																						
+SOLAR			0.06		
+																																																						
+	[AB,*,PrimReserveUp,1,*]	:	2015	:=
+#Assumed 7% of capacity at 33% CF																																																						
+WIND			0.21		
+#Assumed 7% of capacity at 16%CF																																																						
+SOLAR			0.42		
+
+;																																																		
+param	OutputActivityRatio	default	0	:=																																																		
+#Trade parameters for energy																																																						
+#Mode 1 is imports. Mode 5 is exports																																																						
+	[BC,*,TXELEC,5,*]	:	2015	:=
+TX1			1		
+TX2			1		
+	[AB,*,TXELEC,5,*]	:	2015	:=
+TX1			1		
+TX2			1		
+	[BC,*,ELEC,1,*]	:	2015	:=
+TX1			1		
+TX2			1		
+USTRADEJJ			1		
+USTRADEJD			1		
+	[AB,*,ELEC,1,*]	:	2015	:=
+TX1			1		
+TX2			1		
+	[BC,*,MIDC,5,*]	:	2015	:=
+USTRADEJJ			1		
+USTRADEJD			1		
+																																																						
+#Trade parameters for peak hour demand																																																						
+#Mode 2 is imports. Mode 6 is exports																																																						
+	[BC,*,TXPHD,6,*]	:	2015	:=
+TX1			0.16		
+TX2			0.16		
+	[AB,*,TXPHD,6,*]	:	2015	:=
+TX1			0.16	
+TX2			0.16		
+	[BC,*,PHD,2,*]	:	2015	:=
+TX1			0.16		
+TX2			0.16		
+	[AB,*,PHD,2,*]	:	2015	:=
+TX1			0.16		
+TX2			0.16		
+																																																																																																									
+#Trade parameters for ramping																																																						
+#TXRAMP is the transmission version of PrimReserveUp																																																						
+#Mode 3 is imports. Mode 7 is exports																																																						
+	[BC,*,TXRAMP,7,*]	:	2015	:=
+TX1			1		
+TX2			1		
+	[AB,*,TXRAMP,7,*]	:	2015	:=
+TX1			1		
+TX2			1		
+	[BC,*,TXELEC,7,*]	:	2015	:=
+TX1			0.11		
+TX2			0.11		
+	[AB,*,TXELEC,7,*]	:	2015	:=
+TX1			0.18		
+TX2			0.18		
+	[BC,*,PrimReserveUp,3,*]	:	2015	:=
+TX1			1		
+TX2			1		
+	[AB,*,PrimReserveUp,3,*]	:	2015	:=
+TX1			1		
+TX2			1		
+	[BC,*,ELEC,3,*]	:	2015	:=
+TX1			0.18		
+TX2			0.18		
+	[AB,*,ELEC,3,*]	:	2015	:=
+TX1			0.11		
+TX2			0.11		
+
+
+	[BC,*,TXRESERV,8,*]	:	2015	:=
+TX1			1		
+TX2			1		
+	[AB,*,TXRESERV,8,*]	:	2015	:=
+TX1			1		
+TX2			1		
+	[BC,*,TXELEC,8,*]	:	2015	:=
+TX1			0.47	
+TX2			0.47		
+	[AB,*,TXELEC,8,*]	:	2015	:=
+TX1			0.47		
+TX2			0.47		
+	
+	[BC,*,SecReserveUp,4,*]	:	2015	:=
+TX1			1		
+TX2			1		
+	[AB,*,SecReserveUp,4,*]	:	2015	:=
+TX1			1		
+TX2			1		
+	[BC,*,ELEC,4,*]	:	2015	:=
+TX1			0.47		
+TX2			0.47		
+	[AB,*,ELEC,4,*]	:	2015	:=
+TX1			0.47		
+TX2			0.47	
+																																																						
+#Outputs for energy																																																						
+	[BC,*,ELEC,1,*]	:	2015	:=
+SCGT			1		
+CCGT			1		
+CCGTCCS			1		
+COALCCS			1		
+GMSPC			1		
+MICARVL			1		
+SITEC			1		
+HYDRO			1		
+WIND			1		
+GEOTHERM		1		
+BIOMASS			1		
+SOLAR			1		
+	[AB,*,ELEC,1,*]	:	2015	:=
+SCGT			1		
+CCGT			1		
+CCGTCCS			1		
+COALCCS			1		
+GMSPC			1		
+MICARVL			1		
+SITEC			1		
+HYDRO			1		
+WIND			1		
+GEOTHERM		1		
+BIOMASS			1		
+SOLAR			1	
+																																																						
+#Outputs for peak hour demand																																																						
+#Ratio of 1/6 means 6 times capacity must be devoted to produce 1 unit																																																						
+	[BC,*,PHD,2,*]	:	2015	:=
+SCGT			0.16	
+CCGT			0.16		
+CCGTCCS			0.16		
+GMSPC			0.16		
+SITEC			0.16		
+MICARVL			0.16		
+HYDRO			0.16	
+BIOMASS			0.16		
+GEOTHERM		0.16		
+	[AB,*,PHD,2,*]	:	2015	:=
+SCGT			0.16	
+CCGT			0.16		
+CCGTCCS			0.16		
+GMSPC			0.16		
+SITEC			0.16		
+MICARVL			0.16		
+HYDRO			0.16	
+BIOMASS			0.16		
+GEOTHERM		0.16	
+#Outputs for ramping/reserve																																																						
+	[BC,*,PrimReserveUp,3,*]	:	2015	:=
+SCGT			1	
+CCGT			1		
+CCGTCCS			1		
+GMSPC			1		
+SITEC			1		
+MICARVL			1		
+HYDRO			1		
+BIOMASS			1		
+GEOTHERM		1		
+	[AB,*,PrimReserveUp,3,*]	:	2015	:=
+PCOAL			1		
+COALCCS			1		
+SCGT			1		
+CCGT			1		
+CCGTCCS			1		
+HYDRO			1		
+BIOMASS			1		
+GEOTHERM		1		
+																																																						
+	[BC,*,SecReserveUp,4,*]	:	2015	:=
+COALCCS			1		
+SCGT			1		
+CCGT			1		
+CCGTCCS			1		
+GMSPC			1		
+SITEC			1		
+MICARVL			1		
+HYDRO			1		
+BIOMASS			1		
+GEOTHERM		1		
+	[AB,*,SecReserveUp,4,*]	:	2015	:=
+PCOAL			1		
+COALCCS			1		
+COGEN			1		
+SCGT			1		
+CCGT			1		
+CCGTCCS			1		
+HYDRO			1		
+BIOMASS			1		
+GEOTHERM		1		
+																																																						
+#Energy outputs for providing ramping/reserve																																																						
+	[BC,*,ELEC,3,*]	:	2015	:=
+SCGT			0.18	
+CCGT			0.18		
+CCGTCCS			0.18		
+GMSPC			0.18		
+SITEC			0.18		
+MICARVL			0.18		
+HYDRO			0.18		
+BIOMASS			0.18		
+GEOTHERM		0.18		
+																																																						
+	[AB,*,ELEC,3,*]	:	2015	:=
+PCOAL			0.11		
+COALCCS			0.11	
+SCGT			0.11		
+CCGT			0.11		
+CCGTCCS			0.11		
+HYDRO			0.11		
+BIOMASS			0.11		
+GEOTHERM		0.11		
+																																																						
+	[BC,*,ELEC,4,*]	:	2015	:=
+SCGT			0.47	
+CCGT			0.47	
+CCGTCCS			0.47		
+GMSPC			0.47		
+SITEC			0.47		
+MICARVL			0.47		
+HYDRO			0.47		
+BIOMASS			0.47	
+GEOTHERM		0.47	
+	[AB,*,ELEC,4,*]	:	2015	:=
+PCOAL			0.47		
+SCGT			0.47		
+CCGT			0.47		
+CCGTCCS			0.47		
+HYDRO			0.47		
+COALCCS			0.47		
+COGEN			0.47		
+BIOMASS			0.47		
+GEOTHERM		0.47		
+																																																						
+#Fuel generation																																																						
+	[BC,*,COAL,1,*]	:	2015	:=
+IMPCOAL			1	
+																																																						
+	[BC,*,GAS,1,*]	:	2015	:=
+IMPGAS			1		
+																																																						
+	[AB,*,COAL,1,*]	:	2015	:=
+IMPCOAL			1		
+																																																						
+	[AB,*,GAS,1,*]	:	2015	:=
+IMPGAS			1		
+#Biomass with wood debris																																																					
+	[*,BIOMASS,ELEC,5,*]	:	2015	:=
+BC			1		
+AB			1		
+	[*,BIOMASS,PHD,6,*]	:	2015	:=
+BC			0.16		
+AB			0.16		
+	[*,BIOMASS,PrimReserveUp,7,*]	:	2015	:=
+BC			1		
+AB			1		
+	[*,BIOMASS,SecReserveUp,8,*]	:	2015	:=
+BC			1		
+AB			1		
+	[*,BIOMASS,ELEC,7,*]	:	2015	:=
+BC			0.11	
+AB			0.18		
+	[*,BIOMASS,ELEC,8,*]	:	2015	:=
+BC			0.47	
+AB			0.47		
+;																																																						
+																																																					
+																																																										
+																																																										
+#																																																										
+param	FixedCost	default	0	:=																																																						
+[BC,*,*]	:							2015	:=		
+GMSPC								13.42		
+MICARVL								13.42			
+SITEC								13.42		
+COALCCS								63.11			
+SCGT								6.69		
+CCGT								14.6		
+CCGTCCS								30.2		
+WIND								37.57		
+SOLAR								23.46			
+GEOTHERM							95			
+BIOMASS								100.35		
+HYDRO								13.42			
+COGEN								14.6			
+																																																											
+		[AB,*,*]	:						2015	:=
+PCOAL							29.62		
+COALCCS							63.11			
+SCGT							6.69			
+CCGT							14.6			
+CCGTCCS							30.2			
+NUCLR							88.62			
+WIND							37.57			
+SOLAR							23.46		
+GEOTHERM						95		
+BIOMASS							100.35			
+HYDRO							13.42		
+COGEN							14.6																																																													
+	;																																																									
+#																																																										
+param	CapitalCost	default	0	:=																																																		
+[BC,*,*]	:		2015	:=
+#Costs and learning rates from AEO 2015 Table 8.2. Cost and performance characteristics of new central station electricity generating technologies																																																						
+#Uses "minimum total learning by 2035" as learning rate																																																						
+#COALCCS learning (10.75% by 2035/0.57% per year)				0.0057																																																		
+#CCGTCCS learning  (12% by 2035/0.64% per year)				0.0064																																																		
+#Wind learning (5% by 2035/0.25% per year)				0.0025																																																		
+#Solar learning (10% by 2035/0.52% per year)				0.0052																																																		
+COALCCS			6102		
+SCGT			631	
+CCGT			956	
+CCGTCCS			1947	
+WIND			1861		
+GEOTHERM		2301		
+HYDRO			2492	
+SITEC			2492		
+SOLAR			3082	
+TX2			410		
+#Consider adding Mica pumped storage/other pumped storage, cost from 2013 ROR																																																						
+#Cost must be converted to USD																																																						
+#MICAPMP			1250		
+																																																						
+[AB,*,*]	:		2015	:=
+COALCCS			6102		
+SCGT			631		
+CCGT			956		
+#Cogen the same as CCGT																																																					
+COGEN			956	
+
+CCGTCCS			1947		
+WIND			1861		
+GEOTHERM		2301		
+HYDRO			2492		
+SITEC			2492		
+SOLAR			3082		
+TX2			410
+;																																																										
+#																																																										
+param	VariableCost	default	0.00001	:=																																																		
+[BC,*,1,*]	:		2015	:=
+GMSPC			5.96	
+MICARVL			5.96		
+SITEC			5.96		
+HYDRO			5.96		
+COALCCS			8.44	
+SCGT			10.37		
+CCGT			3.27	
+CCGTCCS			6.44		
+BIOMASS			5.26		
+USTRADEJJ		32.76	
+USTRADEJD		42.81		
+																																																						
+[AB,*,1,*]	:		2015	:=
+PCOAL			4.47	
+COALCCS			8.44		
+SCGT			10.37		
+CCGT			3.27		
+CCGTCCS			6.44		
+BIOMASS			5.26	
+COGEN			3.27		
+NUCLR			2.14	
+HYDRO			4.25
+WIND			-25				
+SOLAR			-25		
+																																																				
+[BC,*,2,*]	:		2015	:=
+GMSPC			0.99	
+MICARVL			0.99		
+SITEC			0.99		
+COALCCS			1.41		
+SCGT			1.73		
+CCGT			0.55	
+CCGTCCS			1.07		
+BIOMASS			0.88		
+																																																						
+[AB,*,2,*]	:		2015	:=
+PCOAL			0.75		
+COALCCS			1.41		
+SCGT			1.73		
+CCGT			0.55		
+CCGTCCS			1.07		
+BIOMASS			0.88		
+COGEN			0.55		
+NUCLR			0.36		
+HYDRO			0.71		
+																																																						
+	[BC,*,3,*]	:	2015	:=
+GMSPC			1.66	
+MICARVL			1.66	
+SITEC			1.66	
+HYDRO			1.66	
+COALCCS			3.97	
+SCGT			3.46	
+CCGT			1.23	
+CCGTCCS			1.80	
+BIOMASS			4.29	
+GEOTHERM		3.34	
+
+	[AB,*,3,*]	:	2015	:=
+GMSPC			1.25	
+MICARVL			1.25	
+SITEC			1.25	
+HYDRO			1.25	
+PCOAL			2.94		
+COALCCS			3.38		
+SCGT			2.73	
+CCGT			1.00	
+CCGTCCS			1.35	
+BIOMASS			3.92	
+GEOTHERM		3.34	
+																																																						
+	[BC,*,4,*]	:	2015	:=
+GMSPC			3.39	
+MICARVL			3.39	
+SITEC			3.39	
+HYDRO			3.39	
+COALCCS			6.42	
+SCGT			6.46	
+CCGT			2.18	
+CCGTCCS			3.67	
+BIOMASS			5.81
+GEOTHERM		3.34	
+
+	[AB,*,4,*]	:	2015	:=
+GMSPC			3.39	
+MICARVL			3.39	
+SITEC			3.39
+HYDRO			3.39	
+PCOAL			6.92		
+COALCCS			10.89		
+SCGT			6.46	
+CCGT			2.18	
+CCGTCCS			3.67	
+BIOMASS			5.81	
+GEOTHERM		3.34	
+
+																																																						
+[BC,*,1,*]	:		2015	:=
+#Fossil fuel costs in units of US$2010 per MMBTu. Average growth rate from 2041-2070																																																						
+#High oil price			2.027		
+#Low oil price			1.799		
+#Reference																																																						
+IMPCOAL			1.838		
+																																																						
+#High oil price			4.051		
+#Low oil price			4.153		
+#Reference																																																						
+IMPGAS			4.087	
+#Biomass costs in units of US$2010 per Mwhe. Currency conversion as of Nov 1, 2013, US inflation adjusted. Using 2025-2040 average for 2041-2070																																																						
+MILLGEN			21.7		
+DEBRISGEN		45.2		
+																																																					
+[AB,*,1,*]	:		2015	:=
+#Fossil fuel costs in units of US$2010 per MMBTu. Average growth rate from 2041-2070																																																						
+#High oil price			1.964
+#Low oil price			1.774	
+#Reference																																																						
+IMPCOAL			1.817	
+																																																						
+#High oil price			3.989		
+#Low oil price			4.058	
+#Reference																																																						
+IMPGAS			3.990		
+#Biomass costs in units of US$2010 per Mwhe. Currency conversion as of Nov 1, 2013, US inflation adjusted. Using 2025-2040 average for 2041-2070																																																						
+MILLGEN			21.7	
+DEBRISGEN		45.2		
+																																																						
+;
+
+
+																																																										
+param	ExogenousProduction default 0 :=																																																									
+	[BC,*,*]:	2015	:=	
+MIDC			1000	
+;
+
+param	AvailabilityFactor	default	1	:=																																																											
+			[AB,*,*]	:						2015	:=			
+PCOAL										0.85				
+COALCCS										0.85				
+SCGT										0.92				
+CCGT										0.87				
+CCGTCCS										0.87				
+GEOTHERM				0.92				
+BIOMASS										0.83				
+NUCLR										0.875				
+COGEN										0.85				
+																																																															
+		[BC,*,*]	:						2015	:=				
+PCOAL										0.93				
+COALCCS										0.93				
+SCGT										0.92				
+CCGT										0.87				
+CCGTCCS										0.87				
+GEOTHERM									0.92				
+BIOMASS										0.83				
+COGEN										0.85																																																																			
+;																																																															
+																																																															
+#																																																															
+param	CapacityFactor	default	1	:=																																																											
+		[AB,WIND,*,*]	:	2015	:=
+DJFNGHTPK			0.336		
+DJFMRNGPK			0.381		
+DJFMIDYPK			0.320		
+DJFEVNGPK			0.320		
+DJFNGHTRG			0.398		
+DJFMRNGRG			0.414		
+DJFMIDYRG			0.380		
+DJFEVNGRG			0.394		
+MAMNGHTPK			0.379		
+MAMMRNGPK			0.344		
+MAMMIDYPK			0.411		
+MAMEVNGPK			0.432		
+MAMNGHTRG			0.330		
+MAMMRNGRG			0.255		
+MAMMIDYRG			0.291		
+MAMEVNGRG			0.357		
+JJANGHTPK			0.193		
+JJAMRNGPK			0.119		
+JJAMIDYPK			0.106	
+JJAEVNGPK			0.151		
+JJANGHTRG			0.223		
+JJAMRNGRG			0.153		
+JJAMIDYRG			0.191		
+JJAEVNGRG			0.235		
+SONNGHTPK			0.335		
+SONMRNGPK			0.310		
+SONMIDYPK			0.290		
+SONEVNGPK			0.372	
+SONNGHTRG			0.356		
+SONMRNGRG			0.313		
+SONMIDYRG			0.327		
+SONEVNGRG			0.382		
+																																																			
+	[BC,WIND,*,*]	:	2015	:=
+DJFNGHTPK			0.282		
+DJFMRNGPK			0.282		
+DJFMIDYPK			0.282		
+DJFEVNGPK			0.282		
+DJFNGHTRG			0.282		
+DJFMRNGRG			0.282		
+DJFMIDYRG			0.282		
+DJFEVNGRG			0.282		
+MAMNGHTPK			0.195		
+MAMMRNGPK			0.195		
+MAMMIDYPK			0.195		
+MAMEVNGPK			0.195		
+MAMNGHTRG			0.195		
+MAMMRNGRG			0.195		
+MAMMIDYRG			0.195	
+MAMEVNGRG			0.195		
+JJANGHTPK			0.145		
+JJAMRNGPK			0.145		
+JJAMIDYPK			0.145		
+JJAEVNGPK			0.145		
+JJANGHTRG			0.145		
+JJAMRNGRG			0.145		
+JJAMIDYRG			0.145		
+JJAEVNGRG			0.145	
+SONNGHTPK			0.251		
+SONMRNGPK			0.251		
+SONMIDYPK			0.251	
+SONEVNGPK			0.251		
+SONNGHTRG			0.251		
+SONMRNGRG			0.251		
+SONMIDYRG			0.251		
+SONEVNGRG			0.251		
+
+[BC,SOLAR,*,*]		:	2015	:=
+DJFNGHTPK			0.000	
+DJFMRNGPK			0.000	
+DJFMIDYPK			0.344		
+DJFEVNGPK			0.080	
+DJFNGHTRG			0.000	
+DJFMRNGRG			0.042		
+DJFMIDYRG			0.385	
+DJFEVNGRG			0.069		
+MAMNGHTPK			0.000	
+MAMMRNGPK			0.172		
+MAMMIDYPK			0.518		
+MAMEVNGPK			0.163	
+MAMNGHTRG			0.000		
+MAMMRNGRG			0.214	
+MAMMIDYRG			0.511	
+MAMEVNGRG			0.148		
+JJANGHTPK			0.000		
+JJAMRNGPK			0.217	
+JJAMIDYPK			0.623		
+JJAEVNGPK			0.236		
+JJANGHTRG			0.000		
+JJAMRNGRG			0.173		
+JJAMIDYRG			0.516		
+JJAEVNGRG			0.141		
+SONNGHTPK			0.000		
+SONMRNGPK			0.000		
+SONMIDYPK			0.176		
+SONEVNGPK			0.017		
+SONNGHTRG			0.000		
+SONMRNGRG			0.032	
+SONMIDYRG			0.319		
+SONEVNGRG			0.034	
+																																																						
+[AB,SOLAR,*,*]		:	2015	:=
+DJFNGHTPK			0.000		
+DJFMRNGPK			0.016		
+DJFMIDYPK			0.570		
+DJFEVNGPK			0.040		
+DJFNGHTRG			0.000		
+DJFMRNGRG			0.065		
+DJFMIDYRG			0.508		
+DJFEVNGRG			0.070		
+MAMNGHTPK			0.000		
+MAMMRNGPK			0.234		
+MAMMIDYPK			0.542		
+MAMEVNGPK			0.131		
+MAMNGHTRG			0.000		
+MAMMRNGRG			0.302		
+MAMMIDYRG			0.518		
+MAMEVNGRG			0.126		
+JJANGHTPK			0.000		
+JJAMRNGPK			0.243		
+JJAMIDYPK			0.544		
+JJAEVNGPK			0.166		
+JJANGHTRG			0.000		
+JJAMRNGRG			0.260	
+JJAMIDYRG			0.546		
+JJAEVNGRG			0.127		
+SONNGHTPK			0.000		
+SONMRNGPK			0.000		
+SONMIDYPK			0.414		
+SONEVNGPK			0.000		
+SONNGHTRG			0.000		
+SONMRNGRG			0.083		
+SONMIDYRG			0.464		
+SONEVNGRG			0.032	
+
+[AB,HYDRO,*,*]	:	2015	:=
+DJFNGHTPK			0.044		
+DJFMRNGPK			0.071		
+DJFMIDYPK			0.174		
+DJFEVNGPK			0.189		
+DJFNGHTRG			0.044	
+DJFMRNGRG			0.052		
+DJFMIDYRG			0.143		
+DJFEVNGRG			0.147		
+MAMNGHTPK			0.034		
+MAMMRNGPK			0.074	
+MAMMIDYPK			0.133		
+MAMEVNGPK			0.131		
+MAMNGHTRG			0.392	
+MAMMRNGRG			0.444		
+MAMMIDYRG			0.532		
+MAMEVNGRG			0.501	
+JJANGHTPK			0.211		
+JJAMRNGPK			0.265		
+JJAMIDYPK			0.330		
+JJAEVNGPK			0.338	
+JJANGHTRG			0.297		
+JJAMRNGRG			0.390		
+JJAMIDYRG			0.523		
+JJAEVNGRG			0.483		
+SONNGHTPK			0.062		
+SONMRNGPK			0.059		
+SONMIDYPK			0.119		
+SONEVNGPK			0.129		
+SONNGHTRG			0.070		
+SONMRNGRG			0.087		
+SONMIDYRG			0.153		
+SONEVNGRG			0.147		
+
+	[BC,HYDRO,*,*]	:	2015	:=
+DJFNGHTPK			0.38		
+DJFMRNGPK			0.38		
+DJFMIDYPK			0.38		
+DJFEVNGPK			0.38		
+DJFNGHTRG			0.38		
+DJFMRNGRG			0.38		
+DJFMIDYRG			0.38		
+DJFEVNGRG			0.38		
+MAMNGHTPK			0.51		
+MAMMRNGPK			0.51		
+MAMMIDYPK			0.51		
+MAMEVNGPK			0.51		
+MAMNGHTRG			0.51		
+MAMMRNGRG			0.51		
+MAMMIDYRG			0.51		
+MAMEVNGRG			0.51		
+JJANGHTPK			0.61		
+JJAMRNGPK			0.61		
+JJAMIDYPK			0.61		
+JJAEVNGPK			0.61		
+JJANGHTRG			0.61		
+JJAMRNGRG			0.61		
+JJAMIDYRG			0.61		
+JJAEVNGRG			0.61		
+SONNGHTPK			0.43		
+SONMRNGPK			0.43		
+SONMIDYPK			0.43		
+SONEVNGPK			0.43		
+SONNGHTRG			0.43		
+SONMRNGRG			0.43		
+SONMIDYRG			0.43		
+SONEVNGRG			0.43		
+
+[BC,USTRADEJJ,*,*]		:	2015	:=
+DJFNGHTPK			0.66		
+DJFMRNGPK			0.66		
+DJFMIDYPK			0.66		
+DJFEVNGPK			0.66	
+DJFNGHTRG			0.66		
+DJFMRNGRG			0.66		
+DJFMIDYRG			0.66		
+DJFEVNGRG			0.66		
+MAMNGHTPK			1		
+MAMMRNGPK			1		
+MAMMIDYPK			1		
+MAMEVNGPK			1		
+MAMNGHTRG			1		
+MAMMRNGRG			1		
+MAMMIDYRG			1		
+MAMEVNGRG			1		
+JJANGHTPK			0.33		
+JJAMRNGPK			0.33		
+JJAMIDYPK			0.33		
+JJAEVNGPK			0.33		
+JJANGHTRG			0.33		
+JJAMRNGRG			0.33		
+JJAMIDYRG			0.33		
+JJAEVNGRG			0.33		
+SONNGHTPK			0		
+SONMRNGPK			0		
+SONMIDYPK			0		
+SONEVNGPK			0		
+SONNGHTRG			0		
+SONMRNGRG			0		
+SONMIDYRG			0		
+SONEVNGRG			0		
+																																																						
+[BC,USTRADEJD,*,*]		:	2015	:=
+DJFNGHTPK			0.33		
+DJFMRNGPK			0.33		
+DJFMIDYPK			0.33		
+DJFEVNGPK			0.33		
+DJFNGHTRG			0.33	
+DJFMRNGRG			0.33
+DJFMIDYRG			0.33		
+DJFEVNGRG			0.33		
+MAMNGHTPK			0		
+MAMMRNGPK			0		
+MAMMIDYPK			0		
+MAMEVNGPK			0		
+MAMNGHTRG			0		
+MAMMRNGRG			0		
+MAMMIDYRG			0		
+MAMEVNGRG			0		
+JJANGHTPK			0.66		
+JJAMRNGPK			0.66		
+JJAMIDYPK			0.66		
+JJAEVNGPK			0.66		
+JJANGHTRG			0.66		
+JJAMRNGRG			0.66		
+JJAMIDYRG			0.66		
+JJAEVNGRG			0.66		
+SONNGHTPK			1		
+SONMRNGPK			1		
+SONMIDYPK			1		
+SONEVNGPK			1		
+SONNGHTRG			1		
+SONMRNGRG			1		
+SONMIDYRG			1		
+SONEVNGRG			1		
+																																																														
+;																																																															
+																																																															
+# Units are Mt/TWh																																																															
+param	EmissionActivityRatio	default	0	:=																																																											
+	[BC,*,CO2,1,*]	:						2015	:=					
+IMPCOAL										0.097		
+IMPGAS										0.053		
+	
+	[AB,*,CO2,1,*]	:						2015	:=					
+IMPCOAL										0.097		
+IMPGAS										0.053		
+
+	[BC,*,IMPORTS,1,*]	:						2015	:=					
+USTRADEJJ								1						
+USTRADEJD								1						
+TX1								1						
+TX2								1						
+	[BC,*,IMPORTS,2,*]	:						2015	:=					
+TX1								.16						
+TX2								.16						
+	[BC,*,IMPORTS,3,*]	:						2015	:=					
+TX1								0.11						
+TX2								0.11						
+	[BC,*,IMPORTS,4,*]	:						2015	:=					
+TX1								0.47						
+TX2								0.47						
+	[BC,*,IMPORTS,5,*]	:						2015	:=					
+USTRADEJJ								-1						
+USTRADEJD								-1						
+TX1								-1						
+TX2								-1						
+	[BC,*,IMPORTS,6,*]	:						2015	:=					
+TX1								-0.16						
+TX2								-0.16						
+	[BC,*,IMPORTS,7,*]	:						2015	:=					
+TX1								-0.18					
+TX2								-0.18						
+	[BC,*,IMPORTS,8,*]	:						2015	:=					
+TX1								-0.47						
+TX2								-0.47						
+	[AB,*,IMPORTS,1,*]	:						2015	:=					
+TX1								1						
+TX2								1						
+	[AB,*,IMPORTS,2,*]	:						2015	:=					
+TX1								.16						
+TX2								.16						
+	[AB,*,IMPORTS,3,*]	:						2015	:=					
+TX1								0.18						
+TX2								0.18						
+	[AB,*,IMPORTS,4,*]	:						2015	:=					
+TX1								0.47						
+TX2								0.47						
+	[AB,*,IMPORTS,5,*]	:						2015	:=					
+TX1								-1						
+TX2								-1						
+	[AB,*,IMPORTS,6,*]	:						2015	:=					
+TX1								-0.16						
+TX2								-0.16						
+	[AB,*,IMPORTS,7,*]	:						2015	:=					
+TX1								-0.11						
+TX2								-0.11						
+	[AB,*,IMPORTS,8,*]	:						2015	:=					
+TX1								-0.47						
+TX2								-0.47						
+
+
+	
+[AB,*,CO2c,1,*]:							2015	:=					
+PCOAL						0								
+SCGT						0								
+CCGT						0								
+COGEN						0								
+;																																																															
+																																																															
+#																																																															
+param	EmissionsPenalty	default 0		:=																																																											
+	[AB,*,*]	:						2015:=																																																															
+#	CO2						1.8																																																																	
+	CO2									1.8																																																																							
+#	CO2c						0.000001																																																																	
+																																																																																																																									
+	[BC,*,*]	:						2015	:=																																																															
+CO2								30																																																																
+																																																																																																																									
+;																																																																																																																									
+#																																																																																																																									
+param	ReserveMarginTagFuel	default	0	:=																																																																																																																					
+	[BC,*,*]	:						2015	:=																																																															
+ELEC									1																																																															
+	[AB,*,*]	:						2015	:=																																																															
+ELEC									1																																																															
+;																																																																																																																									
+																																																																																																																									
+param	ReserveMargin	:						2015	:=																																																														
+BC																	0							
+AB																	0					
+;																																																																																																																									
+#																																																																																																																									
+param	ReserveMarginTagTechnology	default	0	:=																																																																																																																					
+	[BC,*,*]	:						2015:=																																																															
+SCGT								1																																																																
+COALCCS								1																																																																
+CCGT								1																																																																
+CCGTCCS								1																																																																
+GEOTHERM								1																																																																
+BIOMASS								1																																																																
+GMSPC								1																																																																
+HYDRO								1																																																																
+MICARVL								1																																																																
+SITEC								1																																																																
+																																																																																																																									
+																																																																																																																									
+	[AB,*,*]	:						2015:=																																																															
+PCOAL								1																																																																
+SCGT								1																																																																
+COALCCS								1																																																																
+CCGT								1																																																																
+CCGTCCS								1																																																																
+GEOTHERM								1																																																																
+BIOMASS								1																																																																
+NUCLR								1																																																																
+HYDRO								1																																																																
+COGEN								1																																																																;																																																													
+																																																													
+#																																																													
+param	OperationalLife	default	80	:	PCOAL	COALCCS	SCGT	CCGT	CCGTCCS	BIOMASS	NUCLR	WIND	SOLAR	GEOTHERM	COGEN:=
+AB										40		40		30		30	 	30		20		60		25		25		40			30
+BC										40		40		30		30		30		20		60		25		25		40			30
+;																																																									
+																																																														
+#		
+param	ResidualCapacity 	default	0	:=																																																					
+[BC,*,*]	:	2015	:=				
+GMSPC		3.46						
+SITEC		0					
+MICARVL		5.17					
+HYDRO		5.06						
+WIND		0.55						
+BIOMASS		0.45						
+																																																									
+[AB,*,*]	:	2015	:=				
+PCOAL		6.286						
+SCGT		1.002						
+COGEN		4.63						
+CCGT		1.703						
+HYDRO		0.894					
+BIOMASS		0.404						
+WIND		1.445						
+;																																																											
+param	TotalAnnualMaxCapacity	default	99999	:=																																																	
+[BC,*,*]	:	2015	:=
+GMSPC		3.46	
+SITEC		1.1		
+MICARVL		5.17		
+HYDRO		5.5		
+#WIND		10.36		
+#SOLAR		10.36		
+GEOTHERM	0		
+USTRADEJJ	3.5		
+USTRADEJD	3.5		
+TX1		0.75		
+TX2		99		
+																																																					
+[AB,*,*]	:	2015	:=
+PCOAL		6.286		
+COGEN		4.7		
+#WIND		11.23		
+#SOLAR		11.23		
+GEOTHERM	0		
+HYDRO		0.894		
+
+;																																																							
+																																																													
+#																																																													
+param	TotalAnnualMinCapacity	default	0	:=	;																																																								
+#										
+																																																		
+																																						
+param	TotalAnnualMaxCapacityInvestment default 9999 :=																																																			
+[AB,*,*]	:							2015	:=
+PCOAL							0.72		
+COALCCS							0.72	
+CCGT						0.72			
+CCGTCCS						0.72			
+SCGT						0.72			
+HYDRO						0.72		
+NUCLR						0.72		
+BIOMASS						0.72			
+GEOTHERM						0.72			
+WIND						0.72			
+SOLAR						0.72			
+																																																										
+[BC,*,*]	:							2015	:=
+COALCCS						0.72			
+CCGT						0.72			
+CCGTCCS						0.72			
+SCGT						0.72			
+HYDRO						0.72		
+BIOMASS						0.72			
+GEOTHERM						0.72			
+WIND						0.72			
+SOLAR						0.72			
+
+;																																																															
+#																																																													
+param	TotalAnnualMinCapacityInvestment	default	0	:=	;																																																								
+#																																																													
+param	TotalTechnologyAnnualActivityUpperLimit	default	99999	:=	
+[BC,*,*]	:			2015	:=
+#These technologies generate biomass to be consumed - limit the amount of each type. Based on 2013 ROR																							
+MILLGEN					0.706	
+DEBRISGEN				3.273	
+#Based on relative size of forestry industry																							
+[AB,*,*]	:			2015	:=
+MILLGEN					0.182	
+DEBRISGEN				0.846	
+
+#50% of ultimately developable hydro capacity based on Hatch AUC report
+HYDRO					28.5				
+;																																																			
+#																																																													
+param	TotalTechnologyAnnualActivityLowerLimit	default	0	:=	;																																																								
+#																																																													
+param	TotalTechnologyModelPeriodActivityUpperLimit	default	99999	:=	;																																																								
+#																																																													
+param	TotalTechnologyModelPeriodActivityLowerLimit	default	0	:=	;																																																								
+#																																																													
+param	RETagTechnology	default	0	:=	
+[BC,*,*]	:		2015	:=
+SOLAR				1				
+BIOMASS				1						
+HYDRO				1						
+WIND				1			
+GEOTHERM 			1				
+GMSPC				1						
+MICARVL				1						
+SITEC				1						
+
+;
+#																																																													
+param	RETagFuel	default	0	:=	
+[BC,*,*]	:		2015	:=
+ELEC				1		
+;																																																								
+#																																																													
+param	REMinProductionTarget	default	0	:=	
+[*,*]	:		2015	:=
+BC				0.93					
+;
+# Conversionlh{l in TIMESLICE, lh in DAILYTIMEBRACKET} 																																		
+# Set equal to 1 to assign a particular time slice to a daily time bracket. Set equal to 0 in order not to assign a particular time slice to a daily time bracket.																																		
+param	Conversionlh	default	0	:=																														
+[*,*]	:	1	2	3	4		:=																											
+DJFNGHTPK		1	0	0	0																													
+DJFMRNGPK		0	1	0	0																													
+DJFMIDYPK		0	0	1	0																													
+DJFEVNGPK		0	0	0	1																													
+DJFNGHTRG		1	0	0	0																													
+DJFMRNGRG		0	1	0	0																													
+DJFMIDYRG		0	0	1	0																													
+DJFEVNGRG		0	0	0	1																													
+MAMNGHTPK		1	0	0	0																													
+MAMMRNGPK		0	1	0	0																													
+MAMMIDYPK		0	0	1	0																													
+MAMEVNGPK		0	0	0	1																													
+MAMNGHTRG		1	0	0	0																													
+MAMMRNGRG		0	1	0	0																													
+MAMMIDYRG		0	0	1	0																													
+MAMEVNGRG		0	0	0	1																													
+JJANGHTPK		1	0	0	0																													
+JJAMRNGPK		0	1	0	0																													
+JJAMIDYPK		0	0	1	0																													
+JJAEVNGPK		0	0	0	1																													
+JJANGHTRG		1	0	0	0																													
+JJAMRNGRG		0	1	0	0																													
+JJAMIDYRG		0	0	1	0																													
+JJAEVNGRG		0	0	0	1																													
+SONNGHTPK		1	0	0	0																													
+SONMRNGPK		0	1	0	0																													
+SONMIDYPK		0	0	1	0																													
+SONEVNGPK		0	0	0	1																													
+SONNGHTRG		1	0	0	0																													
+SONMRNGRG		0	1	0	0																													
+SONMIDYRG		0	0	1	0																													
+SONEVNGRG		0	0	0	1																													
+;																																		
+# Conversionld{l in TIMESLICE, ld in DAYTYPE}																																		
+# Set equal to 1 to assign a particular time slice to a day type. Set equal to 0 in order not to assign a particular time slice to a day type.																																		
+param	Conversionld	default	1	:=																														
+[*,*]	:		1	2						:=																									
+DJFNGHTPK		0	1																															
+DJFMRNGPK		0	1																															
+DJFMIDYPK		0	1																															
+DJFEVNGPK		0	1																															
+DJFNGHTRG		1	0																															
+DJFMRNGRG		1	0																															
+DJFMIDYRG		1	0																															
+DJFEVNGRG		1	0																															
+MAMNGHTPK		0	1																															
+MAMMRNGPK		0	1																															
+MAMMIDYPK		0	1																															
+MAMEVNGPK		0	1																															
+MAMNGHTRG		1	0																															
+MAMMRNGRG		1	0																															
+MAMMIDYRG		1	0																															
+MAMEVNGRG		1	0																															
+JJANGHTPK		0	1																															
+JJAMRNGPK		0	1																															
+JJAMIDYPK		0	1																															
+JJAEVNGPK		0	1																															
+JJANGHTRG		1	0																															
+JJAMRNGRG		1	0																															
+JJAMIDYRG		1	0																															
+JJAEVNGRG		1	0																															
+SONNGHTPK		0	1																															
+SONMRNGPK		0	1																															
+SONMIDYPK		0	1																															
+SONEVNGPK		0	1																															
+SONNGHTRG		1	0																															
+SONMRNGRG		1	0																															
+SONMIDYRG		1	0																															
+SONEVNGRG		1	0																															
+;																																		
+# Conversionls{l in TIMESLICE, ls in SEASON}"																																		
+# Set equal to 1 to assign a particular time slice to a season. Set equal to 0 in order not to assign a particular time slice to a season.																																		
+param Conversionls default 0 :=																																		
+[*,*]	:	1	2	3	4	:=																												
+DJFNGHTPK		1	0	0	0																													
+DJFMRNGPK		1	0	0	0																													
+DJFMIDYPK		1	0	0	0																													
+DJFEVNGPK		1	0	0	0																													
+DJFNGHTRG		1	0	0	0																													
+DJFMRNGRG		1	0	0	0																													
+DJFMIDYRG		1	0	0	0																													
+DJFEVNGRG		1	0	0	0																													
+MAMNGHTPK		0	1	0	0																													
+MAMMRNGPK		0	1	0	0																													
+MAMMIDYPK		0	1	0	0																													
+MAMEVNGPK		0	1	0	0																													
+MAMNGHTRG		0	1	0	0																													
+MAMMRNGRG		0	1	0	0																													
+MAMMIDYRG		0	1	0	0																													
+MAMEVNGRG		0	1	0	0																													
+JJANGHTPK		0	0	1	0																													
+JJAMRNGPK		0	0	1	0																													
+JJAMIDYPK		0	0	1	0																													
+JJAEVNGPK		0	0	1	0																													
+JJANGHTRG		0	0	1	0																													
+JJAMRNGRG		0	0	1	0																													
+JJAMIDYRG		0	0	1	0																													
+JJAEVNGRG		0	0	1	0																													
+SONNGHTPK		0	0	0	1																													
+SONMRNGPK		0	0	0	1																													
+SONMIDYPK		0	0	0	1																													
+SONEVNGPK		0	0	0	1																													
+SONNGHTRG		0	0	0	1																													
+SONMRNGRG		0	0	0	1																													
+SONMIDYRG		0	0	0	1																													
+SONEVNGRG		0	0	0	1																													
+;																																		
+																																		
+#param TimeSliceLinkTag(r in REGION, l in TIMESLICE, ll in TIMESLICE);																																		
+#Links time slices with each other to limit generation and online capacity reductions. Can as well be used to link future to past time slices to limit the capacity reduction in one time slice based on a future online capacity.																																		
+param 	TimeSliceLinkTag 	default	0	:=																														
+																																		
+[AB,*,*] :		DJFNGHTPK	DJFMRNGPK	DJFMIDYPK	DJFEVNGPK	DJFNGHTRG	DJFMRNGRG	DJFMIDYRG	DJFEVNGRG	MAMNGHTPK	MAMMRNGPK	MAMMIDYPK	MAMEVNGPK	MAMNGHTRG	MAMMRNGRG	MAMMIDYRG	MAMEVNGRG	JJANGHTPK	JJAMRNGPK	JJAMIDYPK	JJAEVNGPK	JJANGHTRG	JJAMRNGRG	JJAMIDYRG	JJAEVNGRG	SONNGHTPK	SONMRNGPK	SONMIDYPK	SONEVNGPK	SONNGHTRG	SONMRNGRG	SONMIDYRG	SONEVNGRG	:=	
+DJFNGHTPK		0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+DJFMRNGPK		1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+DJFMIDYPK		0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+DJFEVNGPK		1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+DJFNGHTRG		0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+DJFMRNGRG		0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+DJFMIDYRG		0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+DJFEVNGRG		0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+MAMNGHTPK		0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+MAMMRNGPK		0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+MAMMIDYPK		0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+MAMEVNGPK		0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+MAMNGHTRG		0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+MAMMRNGRG		0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+MAMMIDYRG		0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+MAMEVNGRG		0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+JJANGHTPK		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	
+JJAMRNGPK		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	
+JJAMIDYPK		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	
+JJAEVNGPK		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	
+JJANGHTRG		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	
+JJAMRNGRG		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	
+JJAMIDYRG		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	
+JJAEVNGRG		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	
+SONNGHTPK		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	
+SONMRNGPK		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	
+SONMIDYPK		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	
+SONEVNGPK		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	
+SONNGHTRG		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	
+SONMRNGRG		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	
+SONMIDYRG		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	
+SONEVNGRG		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	
+																																		
+[BC,*,*] :		DJFNGHTPK	DJFMRNGPK	DJFMIDYPK	DJFEVNGPK	DJFNGHTRG	DJFMRNGRG	DJFMIDYRG	DJFEVNGRG	MAMNGHTPK	MAMMRNGPK	MAMMIDYPK	MAMEVNGPK	MAMNGHTRG	MAMMRNGRG	MAMMIDYRG	MAMEVNGRG	JJANGHTPK	JJAMRNGPK	JJAMIDYPK	JJAEVNGPK	JJANGHTRG	JJAMRNGRG	JJAMIDYRG	JJAEVNGRG	SONNGHTPK	SONMRNGPK	SONMIDYPK	SONEVNGPK	SONNGHTRG	SONMRNGRG	SONMIDYRG	SONEVNGRG	:=	
+DJFNGHTPK		0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+DJFMRNGPK		1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+DJFMIDYPK		0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+DJFEVNGPK		1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+DJFNGHTRG		0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+DJFMRNGRG		0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+DJFMIDYRG		0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+DJFEVNGRG		0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+MAMNGHTPK		0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+MAMMRNGPK		0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+MAMMIDYPK		0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+MAMEVNGPK		0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+MAMNGHTRG		0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+MAMMRNGRG		0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+MAMMIDYRG		0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+MAMEVNGRG		0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
+JJANGHTPK		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	
+JJAMRNGPK		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	
+JJAMIDYPK		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	
+JJAEVNGPK		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	
+JJANGHTRG		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	
+JJAMRNGRG		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	
+JJAMIDYRG		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	
+JJAEVNGRG		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	0	0	0	0	
+SONNGHTPK		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	
+SONMRNGPK		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	
+SONMIDYPK		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	
+SONEVNGPK		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0	0	
+SONNGHTRG		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	
+SONMRNGRG		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	
+SONMIDYRG		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	
+SONEVNGRG		0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	
+
+;																																																																																																																													
+																																															
+# To avoid OSeMOSYS taking a whole part of a season to fill up the storage, and to avoid defining smaller seasons, set it to zero, run the model, and check the StorageLevelYearStart "																																																													
+# variable of the following year and use a similar value for StorageLevelStart. Alternatively, model a few years before the first year of your interest."																																																													
+param StorageLevelStart default 999:=																																																													
+;																																																													
+# DaysInDayType{ls in SEASON, ld in DAYTYPE, y in YEAR};																																																												
+# Number of days for each day type within a week, i.e., out of 7 																																																													
+param DaysInDayType default 7:=
+[*,1,*] : 					2015	:=																																																											
+1							6   			
+2							6   			
+3							6   	
+4     							6   	
+
+[*,2,*] : 					2015	:=																																																											
+1							1   			
+2							1   			
+3							1   	
+4     							1   	
+
+;																																																													
+# StorageMaxChargeRate{r in REGION, s in STORAGE}; Unit: GW																																																													
+param StorageMaxChargeRate default 99:=																																																													
+;																																																													
+# StorageMaxDischargeRate{r in REGION, s in STORAGE}; Unit: GW																																																													
+param StorageMaxDischargeRate default 99:=																																																													
+;																																																													
+# MinStorageCharge{r in REGION, s in STORAGE, y in YEAR}; Unit: fraction of MaxStorageCharge, i.e., between 0.00 and 0.99)				
+param MinStorageCharge default 0. :=																																																													
+								;																																																																						
+#																																																													
+# TechnologyToStorage{r in REGION, t in TECHNOLOGY, s in STORAGE, m in MODE_OF_OPERATION}																																																												
+param	TechnologyToStorage	default	0	:=	;																																																								
+																																																																																																																					
+#																																																													
+# TechnologyFromStorage{r in REGION, t in TECHNOLOGY, s in STORAGE, m in MODE_OF_OPERATION}																																																													
+param	TechnologyFromStorage	default	0	:=	;																																																								
+																																																																																																																										
+#																																																													
+# StorageLevelStart{r in REGION, s in STORAGE}																																																												
+# At beginning of first year. Attention: if zero, OSeMOSYS will use the first time slices in the entire first day type in the entire first season to fill the storage. "																																												
+																																																										
+# OperationalLifeStorage{r in REGION, s in STORAGE, y in YEAR}; Unit: years																																																													
+param OperationalLifeStorage default			99	:=																																																									
+;																																																													
+# CapitalCostStorage{r in REGION, s in STORAGE, y in YEAR}; Unit: USD/GWa																																																													
+param CapitalCostStorage default 			0	:=																																																									
+;																																																													
+# DiscountRateStorage{r in REGION, s in STORAGE}; Unit: fraction																																																												
+param DiscountRateStorage default			0	:=																																																									
+;																																																													
+# ResidualStorageCapacity{r in REGION, s in STORAGE, y in YEAR}; 																																																													
+# Storage capacity which is available from before the modelling period, or which is know to become available in a specific year. Unit: GWa																																																											
+param ResidualStorageCapacity default			999	:=																																																									
+;																																																													
+# CapacityOfOneTechnologyUnit{r in REGION, t in TECHNOLOGY, y in YEAR}; Unit: GW																																																													
+# Defines the minimum size of one capacity addition. If set to zero, no mixed integer linear programming (MILP) is used and computational time will decrease."																																																													
+param CapacityOfOneTechnologyUnit default	0	:=	;																																																										
+#																																																													
+# TradeRoute{r in REGION, rr in REGION, f in FUEL, y in YEAR}																																																													
+# Defines which region r is linked with which region rr in order to enable or disable trading of a specific fuel. Unit: Fraction, either 1 or 0"																																																													
+# 1 defines a trade link and 0 ensuring that no trade occurs. Values inbetween are not allowed. If r is linked to rr, rr has also to be linked with r."																																																													
+# I.e., for one specific year and fuel, this parameter is entered as a symmetric matrix (with a diagonal of zeros)."																																																														
+param TradeRoute default	0 :=
+	[BC,AB,*,*]	:		2015	:=
+TXELEC					1   			
+TXPHD					1   			
+TXRAMP					1   			
+	[AB,BC,*,*]	:		2015	:=
+TXELEC					1   		
+TXPHD					1   			
+TXRAMP					1   			
+	;
+
+param MarketPrice default 0 := 
+;	
+# Hydro Definitions
+
+param RhoWater := 1000000 ;
+param Gravity := 9.81 ;
+param HydroTurbineEfficiency := 0.9;		
+# Watts to model units.  In this case we want to convert Watts to GW.
+param WattsToModelUnits := 0.000000001;
+# This parameter is used to convert units of time to years (example of flow into reservoir in m^3/s.  This needs to be converted by a factor of 8760 Hours/year *60 minutes/hour *60seconds/minute to give 31536000 to match the base m^3/s to the models m^3/annum unit.
+param FlowUnittoYearConversion := 31536000 ;
+
+param TechnologyFromHydro default 0  :=
+[BC,*,1,*]	:	WLSTN	 CLMBIA			CRES:=
+	GMSPC				1		0		0
+	MICARVL				0		1		0
+	SITEC				0		0		1
+	
+[BC,*,2,*]	:	WLSTN	 CLMBIA			CRES:=
+	GMSPC				0.16		0		0
+	MICARVL				0		0.161		0
+	SITEC				0		0		0.159
+	
+[BC,*,3,*]	:	WLSTN	 CLMBIA			CRES:=
+	GMSPC				0.181		0		0
+	MICARVL				0		0.182		0
+	SITEC				0		0		0.181
+	
+[BC,*,4,*]	:	WLSTN	 CLMBIA			CRES:=
+	GMSPC				0.475		0		0
+	MICARVL				0		0.47		0
+	SITEC				0		0		0.475
+;
+
+param ReservoirHead default 0 :=
+WLSTN		247
+CLMBIA		415
+CRES		60
+;
+
+# in m^3/s - Need to convert from s to years...
+param ReservoirMaxDischargeRate default 999999999 :=	;									
+
+# in m^3/s
+param ReservoirMinDischargeRate default 0 :=		;
+
+# in m^3 - OK
+param ReservoirLiveStorageVolume default 0 :=
+WLSTN	39541000	
+CLMBIA	16652004			
+#From BC Hydro Peace River water use plan
+#KNBSKT	14801782100				#BC Hydro Columbia water use plan
+#RVSTLK	1850222760
+;
+
+# in m^3/s - Need to convert from s to year....
+param ReservoirExternalInflow default 0 :=																																																									
+																																																									
+[BC,*,*,WLSTN]	:	2015	:=				
+1		0.309						
+2		0.687					
+3		1.965						
+4		0.709						
+[BC,*,*,CLMBIA] 	:	2015	:=				
+1		0.152						
+2		0.333						
+3		1.415						
+4		0.373						
+
+;
+
+param ReservoirLevelStart default 0	 :=
+[*,*]:		WLSTN				CRES	CLMBIA:=
+#Williston Reservoir Cap is 39,472,000,000 m^3. Dinosaur is negligible
+BC			395410		0		166520
+	;
+
+
+
+# LEFTHANDSIDE is DOWNSTREAM from RIGHTHANDSIDE
+param DownstreamReservoirTag default 0 :=
+CRES	WLSTN		1
+	;
+
+#Ramping Limits
+
+#param ElectricityForTransmissionTag(r in REGION, f in FUEL)
+#1 if fuel is electricity, otherwise 0
+param ElectricityForTransmissionTag default 0 :=
+AB	ELEC	1
+BC	ELEC	1;
+
+
+#Minimum shares of upward reserve demands which have to be met by plants which are online.
+#param MinPrimReserveUpOnline(r in REGION, Y in YEAR);
+param MinPrimReserveUpOnline default 1 :=
+;
+#param MinSecReserveUpOnline(r in REGION, Y in YEAR);
+param MinSecReserveUpOnline default 1 :=
+;
+
+#param MaxOnlineCapacityReduction(r in REGION, t in TECHNOLOGY, Y in YEAR)																																																						
+#Maximum reduction in online capacity between timesteps. Entered as fraction of online capacity																																																						
+param MaxOnlineCapReduction default 1 	:=																																																																																																						
+[AB,*,*]	:		2015	:=																																																	
+PCOAL			0.33																																																		
+COALCCS			0.33																																																			
+CCGT			0.66																																																			
+CCGTCCS			0.66																																																			
+COGEN			0.5																																																			
+GEOTHERM			0.8																																																			
+																																																																																																							
+[BC,*,*]	:		2015	:=																																																	
+PCOAL			0.33																																																			
+COALCCS			0.33																																																			
+CCGT			0.66																																																			
+CCGTCCS			0.66																																																			
+COGEN			0.5																																																			
+GEOTHERM		0.8																																																			
+;																																																									
+#param MaxGenerationReduction(r in REGION, t in TECHNOLOGY, Y in YEAR);																																																									
+#Maximum reduction in output between timesteps. Entered as a fraction of online capacity																																																						
+param MaxGenerationReduction default 1 :=																																																							
+[AB,*,*]	:		2015	:=																																																	
+PCOAL			0.5																																																			
+COALCCS			0.5																																																		
+CCGT			0.66																																																			
+CCGTCCS			0.66																																																			
+COGEN			0.5																																																			
+GEOTHERM		0.8																																																			
+																																																																																																							
+[BC,*,*]	:		2015	:=																																																	
+PCOAL			0.33																																																			
+COALCCS			0.33																																																			
+CCGT			0.66																																																			
+CCGTCCS			0.66																																																	
+COGEN			0.5																																																		
+GEOTHERM		0.8																																																		
+;																																																																																																							
+																																																																																																							
+#Shares of the available capacity of a technology which may contribute to meet a demand for primary or secondary downward or upward reserve. Entered as fractions.																																																																																																							
+#param MaxPrimReserveDown(r in REGION, t in TECHNOLOGY, Y in YEAR);																																																																																																							
+param MaxPrimReserveDown default 0 :=																																																																																																							
+[AB,*,*]	:		2015	:=
+PCOAL			0.35		
+COALCCS			0.35		
+SCGT			0.80	
+CCGT			0.80		
+CCGTCCS			0.80		
+COGEN			0.35		
+GEOTHERM		0.35		
+HYDRO			0.80		
+BIOMASS			0.35		
+TX1			1.00		
+TX2			1.00		
+																																																						
+[BC,*,*]	:		2015	:=
+PCOAL			0.35		
+COALCCS			0.35		
+SCGT			0.8		
+CCGT			0.8		
+CCGTCCS			0.8		
+COGEN			0.2		
+GEOTHERM			0.2		
+HYDRO			0.33		
+BIOMASS			0.2		
+GMSPC			0.80		
+MICARVL			0.80		
+SITEC			0.80		
+TX1			1.00		
+TX2			1.00	
+;																																																						
+#param MaxPrimReserveUp(r in REGION, t in TECHNOLOGY, Y in YEAR);																																																						
+param MaxPrimReserveUp default 0 :=																																																						
+[AB,*,*]	:		2015	:=
+PCOAL			0.20		
+COALCCS			0.20		
+SCGT			0.80		
+CCGT			0.80		
+CCGTCCS			0.80		
+COGEN			0.20		
+GEOTHERM			0.20		
+HYDRO			0.80		
+BIOMASS			0.20		
+TX1			1.00		
+TX2			1.00		
+																																																						
+[BC,*,*]	:		2015	:=
+PCOAL			0.20		
+COALCCS			0.20		
+SCGT			0.80		
+CCGT			0.80		
+CCGTCCS			0.80		
+COGEN			0.20		
+GEOTHERM			0.20		
+HYDRO			0.33		
+BIOMASS			0.20		
+GMSPC			0.80		
+MICARVL			0.80		
+SITEC			0.80		
+TX1			1.00		
+TX2			1.00		
+;																																																						
+																																																																																																										
+param MaxSecReserveUp default 0 :=																																																						
+[AB,*,*]	:		2015	:=
+PCOAL			0.03		
+COALCCS			0.03		
+SCGT			0.13		
+CCGT			0.13		
+CCGTCCS			0.13		
+COGEN			0.03	
+GEOTHERM		0.03		
+HYDRO			0.13	
+BIOMASS			0.03	
+TX1			0.17	
+TX2			0.17	
+																																																						
+[BC,*,*]	:		2015	:=
+PCOAL			0.03		
+COALCCS			0.03	
+SCGT			0.13		
+CCGT			0.13		
+CCGTCCS			0.13		
+COGEN			0.03	
+GEOTHERM		0.03		
+HYDRO			0.06		
+BIOMASS			0.03		
+GMSPC			0.13		
+MICARVL			0.13		
+SITEC			0.13	
+TX1			0.17		
+TX2			0.17		
+;																																																						
+param MaxSecReserveDown default 0 :=																																																						
+[AB,*,*]	:		2015	:=
+PCOAL			0.06	
+COALCCS			0.06	
+SCGT			0.13		
+CCGT			0.13	
+CCGTCCS			0.13	
+COGEN			0.06	
+GEOTHERM		0.06		
+HYDRO			0.13	
+BIOMASS			0.06		
+TX1			0.17	
+TX2			0.17	
+																																																						
+[BC,*,*]	:		2015	:=
+PCOAL			0.06		
+COALCCS			0.06		
+SCGT			0.13	
+CCGT			0.13		
+CCGTCCS			0.13		
+COGEN			0.03		
+GEOTHERM		0.03		
+HYDRO			0.06		
+BIOMASS			0.03		
+GMSPC			0.30	
+MICARVL			0.30		
+SITEC			0.30		
+TX1			0.17	
+TX2			0.17		
+;																																																						
+																																																																																																							
+#param MinStableOperation(r in REGION, t in TECHNOLOGY, Y in YEAR);																																																																																																							
+#Minimum share of the online capacity at which a power plant may be operated to generate electricity.																																																																																																							
+param MinStableOperation default 0 :=																																																																																																							
+[AB,*,*]	:		2015	:=																																																	
+PCOAL			0.70																																																		
+COALCCS			0.70																																																		
+SCGT			0.20																																																		
+CCGT			0.50																																																		
+CCGTCCS			0.50																																																		
+COGEN			0.60																																																		
+GEOTHERM		0.40																																																		
+HYDRO			0.10																																																		
+BIOMASS			0.70																																																		
+																																																																																																							
+[BC,*,*]	:		2015	:=																																																	
+PCOAL			0.40																																																		
+COALCCS			0.40																																																		
+SCGT			0.20																																																		
+CCGT			0.20																																																		
+CCGTCCS			0.20																																																		
+COGEN			0.60																																																		
+GEOTHERM		0.40																																																		
+HYDRO			0.70																																																	
+BIOMASS			0.40																																																		
+GMSPC			0.05																																																		
+MICARVL			0.05																																																		
+SITEC			0.05																																																		
+;																																																						
+
+#Demands for primary downward and upward reserves, measured in the unit of power, e.g., GW.
+#param PrimReserveDownCapacityDemand(r in REGION, l in TIMESLICE, y in YEAR);
+param 	PrimReserveUpCapacityDemand	default	0	:=																																																	
+																																																					
+[BC,*,*]	:	2015	:=
+DJFNGHTPK		0.198		
+DJFMRNGPK		0.892		
+DJFMIDYPK		0.406		
+DJFEVNGPK		0.732	
+DJFNGHTRG		0.198		
+DJFMRNGRG		0.892	
+DJFMIDYRG		0.406	
+DJFEVNGRG		0.732	
+MAMNGHTPK		0.632		
+MAMMRNGPK		0.068		
+MAMMIDYPK		0.250		
+MAMEVNGPK		0.386		
+MAMNGHTRG		0.180		
+MAMMRNGRG		0.834	
+MAMMIDYRG		0.370		
+MAMEVNGRG		0.504		
+JJANGHTPK		0.052		
+JJAMRNGPK		0.797		
+JJAMIDYPK		0.406		
+JJAEVNGPK		0.250	
+JJANGHTRG		0.052		
+JJAMRNGRG		0.797	
+JJAMIDYRG		0.406	
+JJAEVNGRG		0.250	
+SONNGHTPK		0.147	
+SONMRNGPK		0.852
+SONMIDYPK		0.703
+SONEVNGPK		0.619	
+SONNGHTRG		0.147	
+SONMRNGRG		0.852	
+SONMIDYRG		0.703	
+SONEVNGRG		0.619	
+																																																					
+[AB,*,*]	:	2015	:=
+DJFNGHTPK		0.273		
+DJFMRNGPK		0.632		
+DJFMIDYPK		0.129	
+DJFEVNGPK		0.513		
+DJFNGHTRG		0.273	
+DJFMRNGRG		0.632		
+DJFMIDYRG		0.129		
+DJFEVNGRG		0.513		
+MAMNGHTPK		0.289		
+MAMMRNGPK		0.598	
+MAMMIDYPK		0.249		
+MAMEVNGPK		0.352		
+MAMNGHTRG		0.289		
+MAMMRNGRG		0.598		
+MAMMIDYRG		0.249		
+MAMEVNGRG		0.352		
+JJANGHTPK		0.136		
+JJAMRNGPK		0.598		
+JJAMIDYPK		0.347		
+JJAEVNGPK		0.167		
+JJANGHTRG		0.136		
+JJAMRNGRG		0.598		
+JJAMIDYRG		0.347		
+JJAEVNGRG		0.167		
+SONNGHTPK		0.114		
+SONMRNGPK		0.648		
+SONMIDYPK		0.223	
+SONEVNGPK		0.470	
+SONNGHTRG		0.114		
+SONMRNGRG		0.648		
+SONMIDYRG		0.223		
+SONEVNGRG		0.470		
+;																																																					
+																																																					
+param 	SecReserveUpCapacityDemand	default	0	:=																																																	
+																																																					
+[BC,*,*]	:	2015	:=
+DJFNGHTPK		0.633		
+DJFMRNGPK		0.058		
+DJFMIDYPK		0.428	
+DJFEVNGPK		0.454	
+DJFNGHTRG		0.633		
+DJFMRNGRG		0.058	
+DJFMIDYRG		0.428		
+DJFEVNGRG		0.454	
+MAMNGHTPK		0.118		
+MAMMRNGPK		0.149	
+MAMMIDYPK		0.125		
+MAMEVNGPK		0.151		
+MAMNGHTRG		0.632		
+MAMMRNGRG		0.068		
+MAMMIDYRG		0.250		
+MAMEVNGRG		0.386		
+JJANGHTPK		0.645		
+JJAMRNGPK		0.115
+JJAMIDYPK		0.247		
+JJAEVNGPK		0.422		
+JJANGHTRG		0.645		
+JJAMRNGRG		0.115		
+JJAMIDYRG		0.247	
+JJAEVNGRG		0.422		
+SONNGHTPK		0.767	
+SONMRNGPK		0.052		
+SONMIDYPK		0.248		
+SONEVNGPK		0.427		
+SONNGHTRG		0.767		
+SONMRNGRG		0.052		
+SONMIDYRG		0.248		
+SONEVNGRG		0.427		
+																																																					
+[AB,*,*]	:	2015	:=
+DJFNGHTPK		0.482
+DJFMRNGPK		0.169	
+DJFMIDYPK		0.115	
+DJFEVNGPK		0.328		
+DJFNGHTRG		0.482		
+DJFMRNGRG		0.169		
+DJFMIDYRG		0.115		
+DJFEVNGRG		0.328		
+MAMNGHTPK		0.493	
+MAMMRNGPK		0.060		
+MAMMIDYPK		0.136		
+MAMEVNGPK		0.258		
+MAMNGHTRG		0.493		
+MAMMRNGRG		0.060	
+MAMMIDYRG		0.136		
+MAMEVNGRG		0.258			
+JJANGHTPK		0.491		
+JJAMRNGPK		0.119		
+JJAMIDYPK		0.144	
+JJAEVNGPK		0.440		
+JJANGHTRG		0.491		
+JJAMRNGRG		0.119	
+JJAMIDYRG		0.144	
+JJAEVNGRG		0.440	
+SONNGHTPK		0.425	
+SONMRNGPK		0.178		
+SONMIDYPK		0.177		
+SONEVNGPK		0.338		
+SONNGHTRG		0.425		
+SONMRNGRG		0.178		
+SONMIDYRG		0.177		
+SONEVNGRG		0.338	
+;
+
+param 	SecReserveDownCapacityDemand	default	0	:=	;
+
+param 	PrimReserveDownCapacityDemand	default	0	:=																																																	
+																																																					
+[BC,*,*]	:	2015	:=
+DJFNGHTPK		0.633		
+DJFMRNGPK		0.058	
+DJFMIDYPK		0.428		
+DJFEVNGPK		0.454	
+DJFNGHTRG		0.633		
+DJFMRNGRG		0.058	
+DJFMIDYRG		0.428		
+DJFEVNGRG		0.454		
+MAMNGHTPK		0.632		
+MAMMRNGPK		0.068		
+MAMMIDYPK		0.250		
+MAMEVNGPK		0.386		
+MAMNGHTRG		0.632		
+MAMMRNGRG		0.068		
+MAMMIDYRG		0.250		
+MAMEVNGRG		0.386		
+JJANGHTPK		0.645		
+JJAMRNGPK		0.115		
+JJAMIDYPK		0.247		
+JJAEVNGPK		0.422		
+JJANGHTRG		0.645		
+JJAMRNGRG		0.115		
+JJAMIDYRG		0.247		
+JJAEVNGRG		0.422		
+SONNGHTPK		0.767		
+SONMRNGPK		0.052		
+SONMIDYPK		0.248		
+SONEVNGPK		0.427		
+SONNGHTRG		0.767		
+SONMRNGRG		0.052		
+SONMIDYRG		0.248	
+SONEVNGRG		0.427	
+																																																					
+[AB,*,*]	:	2015	:=
+DJFNGHTPK		0.482		
+DJFMRNGPK		0.169		
+DJFMIDYPK		0.115		
+DJFEVNGPK		0.328		
+DJFNGHTRG		0.482	
+DJFMRNGRG		0.169	
+DJFMIDYRG		0.115		
+DJFEVNGRG		0.328		
+MAMNGHTPK		0.493		
+MAMMRNGPK		0.06		
+MAMMIDYPK		0.136		
+MAMEVNGPK		0.258		
+MAMNGHTRG		0.493		
+MAMMRNGRG		0.06		
+MAMMIDYRG		0.136	
+MAMEVNGRG		0.258		
+JJANGHTPK		0.491		
+JJAMRNGPK		0.119	
+JJAMIDYPK		0.144		
+JJAEVNGPK		0.44		
+JJANGHTRG		0.491		
+JJAMRNGRG		0.119	
+JJAMIDYRG		0.144	
+JJAEVNGRG		0.44		
+SONNGHTPK		0.425		
+SONMRNGPK		0.178		
+SONMIDYPK		0.177		
+SONEVNGPK		0.338		
+SONNGHTRG		0.425		
+SONMRNGRG		0.178		
+SONMIDYRG		0.248	
+SONEVNGRG		0.517
+;
+end;																																																													
+ 
