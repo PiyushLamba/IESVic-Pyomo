@@ -1,0 +1,995 @@
+
+set YEAR;
+set TECHNOLOGY;
+set TIMESLICE;
+set FUEL;
+set EMISSION;
+set MODE_OF_OPERATION;
+set REGION;
+set SEASON;
+set DAYTYPE;
+set DAILYTIMEBRACKET;
+set FLEXIBLEDEMANDTYPE;
+set STORAGE;
+
+param YearSplit{l in TIMESLICE, y in YEAR};
+param DiscountRate{r in REGION};
+param DaySplit{lh in DAILYTIMEBRACKET, y in YEAR};
+param Conversionls{l in TIMESLICE, ls in SEASON};
+param Conversionld{l in TIMESLICE, ld in DAYTYPE};
+param Conversionlh{l in TIMESLICE, lh in DAILYTIMEBRACKET};
+param DaysInDayType{ls in SEASON, ld in DAYTYPE, y in YEAR};
+param TradeRoute{r in REGION, rr in REGION, f in FUEL, y in YEAR};
+param DepreciationMethod{r in REGION};
+param SpecifiedAnnualDemand{r in REGION, f in FUEL, y in YEAR};
+param SpecifiedDemandProfile{r in REGION, f in FUEL, l in TIMESLICE, y in YEAR};
+param AccumulatedAnnualDemand{r in REGION, f in FUEL, y in YEAR};
+param CapacityToActivityUnit{r in REGION, t in TECHNOLOGY};
+param TechWithCapacityNeededToMeetPeakTS{r in REGION, t in TECHNOLOGY};
+param CapacityFactor{r in REGION, t in TECHNOLOGY, l in TIMESLICE, y in YEAR};
+param AvailabilityFactor{r in REGION, t in TECHNOLOGY, y in YEAR};
+param OperationalLife{r in REGION, t in TECHNOLOGY};
+param ResidualCapacity{r in REGION, t in TECHNOLOGY, y in YEAR};
+param InputActivityRatio{r in REGION, t in TECHNOLOGY, f in FUEL, m in MODE_OF_OPERATION, y in YEAR};
+param OutputActivityRatio{r in REGION, t in TECHNOLOGY, f in FUEL, m in MODE_OF_OPERATION, y in YEAR};
+param CapitalCost{r in REGION, t in TECHNOLOGY, y in YEAR};
+param VariableCost{r in REGION, t in TECHNOLOGY, m in MODE_OF_OPERATION, y in YEAR};
+param FixedCost{r in REGION, t in TECHNOLOGY, y in YEAR};
+param TechnologyStorage{r in REGION, t in TECHNOLOGY, s in STORAGE, m in MODE_OF_OPERATION};
+param StorageMaxChargeRate{r in REGION, s in STORAGE};
+param StorageMaxDischargeRate{r in REGION, s in STORAGE};
+param MinStorageCharge{r in REGION, s in STORAGE, y in YEAR};
+param OperationalLifeStorage{r in REGION, s in STORAGE};
+param CapitalCostStorage{r in REGION, s in STORAGE, y in YEAR};
+param ResidualStorageCapacity{r in REGION, s in STORAGE, y in YEAR};
+param StorageMaxCapacity{r in REGION, s in STORAGE, y in YEAR};
+param CapacityOfOneTechnologyUnit{r in REGION, t in TECHNOLOGY, y in YEAR};
+param TotalAnnualMaxCapacity{r in REGION, t in TECHNOLOGY, y in YEAR};
+param TotalAnnualMinCapacity{r in REGION, t in TECHNOLOGY, y in YEAR};
+param TotalAnnualMaxCapacityInvestment{r in REGION, t in TECHNOLOGY, y in YEAR};
+param TotalAnnualMinCapacityInvestment{r in REGION, t in TECHNOLOGY, y in YEAR};
+param TotalTechnologyAnnualActivityUpperLimit{r in REGION, t in TECHNOLOGY, y in YEAR};
+param TotalTechnologyAnnualActivityLowerLimit{r in REGION, t in TECHNOLOGY, y in YEAR};
+param TotalTechnologyModelPeriodActivityUpperLimit{r in REGION, t in TECHNOLOGY};
+param TotalTechnologyModelPeriodActivityLowerLimit{r in REGION, t in TECHNOLOGY};
+param ReserveMarginTagTechnology{r in REGION, t in TECHNOLOGY, y in YEAR};
+param ReserveMarginTagFuel{r in REGION, f in FUEL, y in YEAR};
+param ReserveMargin{r in REGION, y in YEAR};
+param RETagTechnology{r in REGION, t in TECHNOLOGY, y in YEAR};
+param RETagFuel{r in REGION, f in FUEL, y in YEAR};
+param REMinProductionTarget{r in REGION, y in YEAR};
+param EmissionActivityRatio{r in REGION, t in TECHNOLOGY, e in EMISSION, m in MODE_OF_OPERATION, y in YEAR};
+param EmissionsPenalty{r in REGION, e in EMISSION, y in YEAR};
+param AnnualExogenousEmission{r in REGION, e in EMISSION, y in YEAR};
+param AnnualEmissionLimit{r in REGION, e in EMISSION, y in YEAR};
+param ModelPeriodExogenousEmission{r in REGION, e in EMISSION};
+param ModelPeriodEmissionLimit{r in REGION, e in EMISSION};
+param StoredEnergyValue{r in REGION, s in STORAGE};
+
+param StorageLevelStart{r in REGION, s in STORAGE} >= 0;
+param StorageLevelTSStart{r in REGION, s in STORAGE, l in TIMESLICE, y in YEAR} >=0;
+param NewStorageCapacity{r in REGION, s in STORAGE, y in YEAR} >=0;
+param SalvageValueStorage{r in REGION, s in STORAGE, y in YEAR} >=0;
+param StorageLevelYearStart{r in REGION, s in STORAGE, y in YEAR} >=0;		
+param StorageLevelYearFinish{r in REGION, s in STORAGE, y in YEAR} >=0;
+param StorageLevelSeasonStart{r in REGION, s in STORAGE, ls in SEASON, y in YEAR} >=0;
+param StorageLevelDayTypeStart{r in REGION, s in STORAGE, ls in SEASON, ld in DAYTYPE, y in YEAR} >=0;
+param StorageLevelDayTypeFinish{r in REGION, s in STORAGE, ls in SEASON, ld in DAYTYPE, y in YEAR} >=0;
+param NumberOfNewTechnologyUnits{r in REGION, t in TECHNOLOGY, y in YEAR} >= 0,integer;
+param NewCapacity{r in REGION, t in TECHNOLOGY, y in YEAR} >= 0;
+param RateOfActivity{r in REGION, l in TIMESLICE, t in TECHNOLOGY, m in MODE_OF_OPERATION, y in YEAR};#Eliminated the >=0 constraint (PMT)
+param UseByTechnology{r in REGION, l in TIMESLICE, t in TECHNOLOGY, f in FUEL, y in YEAR}>= 0;
+param Trade{r in REGION, rr in REGION, l in TIMESLICE, f in FUEL, y in YEAR};
+param UseAnnual{r in REGION, f in FUEL, y in YEAR}>= 0;
+param VariableOperatingCost{r in REGION, t in TECHNOLOGY, l in TIMESLICE, y in YEAR}>= 0;
+param SalvageValue{r in REGION, t in TECHNOLOGY, y in YEAR}>= 0;
+param DiscountedSalvageValue{r in REGION, t in TECHNOLOGY, y in YEAR}>= 0;
+param OperatingCost{r in REGION, t in TECHNOLOGY, y in YEAR}>= 0;
+param DiscountedTechnologyEmissionsPenalty{r in REGION, t in TECHNOLOGY, y in YEAR}>=0;
+param ModelPeriodEmissions{r in REGION, e in EMISSION}>=0;
+
+param ParameterSelres, symbolic ;
+param VariableSelres, symbolic ;
+param ConstraintSelres, symbolic ;
+
+/* Parameter Printout */
+	printf "param YearSplit :=\n" > ParameterSelres;
+	printf {l in TIMESLICE, y in YEAR}: "\t%s\t%s\t%.15g\n", l, y, YearSplit[l, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+	
+	printf "param DiscountRate :=\n" >> ParameterSelres;
+	printf {r in REGION}: "\t%s\t%.15g\n", r, DiscountRate[r] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+	
+	printf "param DaySplit :=\n" >> ParameterSelres;
+	printf {lh in DAILYTIMEBRACKET, y in YEAR}: "\t%s\t%s\t%.15g\n", lh, y, DaySplit[lh, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+	
+	printf "param Conversionls :=\n" >> ParameterSelres;
+	printf {l in TIMESLICE, ls in SEASON}: "\t%s\t%s\t%.15g\n", l, ls, Conversionls[l, ls] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+	
+	printf "param Conversionld :=\n" >> ParameterSelres;
+	printf {l in TIMESLICE, ld in DAYTYPE}: "\t%s\t%s\t%.15g\n", l, ld, Conversionld[l, ld] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param Conversionlh :=\n" >> ParameterSelres;
+	printf {l in TIMESLICE, lh in DAILYTIMEBRACKET}: "\t%s\t%s\t%.15g\n", l, lh, Conversionlh[l, lh] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param DaysInDayType :=\n" >> ParameterSelres;
+	printf {ls in SEASON, ld in DAYTYPE, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", ls, ld, y, DaysInDayType[ls, ld, y] >> ParameterSelres; 
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param TradeRoute :=\n" >> ParameterSelres;
+	printf {r in REGION, rr in REGION, f in FUEL, y in YEAR}: "\t%s\t%s\t%s\t%s\t%.15g\n", r, rr, f, y, TradeRoute[r, rr, f, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param DepreciationMethod :=\n" >> ParameterSelres;
+	printf {r in REGION}: "\t%s\t%.15g\n", r, DepreciationMethod[r] >> ParameterSelres ;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param SpecifiedAnnualDemand :=\n" >> ParameterSelres;
+	printf {r in REGION, f in FUEL, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, f, y, SpecifiedAnnualDemand[r, f, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param SpecifiedDemandProfile :=\n" >> ParameterSelres;
+	printf {r in REGION, f in FUEL, l in TIMESLICE, y in YEAR}: "\t%s\t%s\t%s\t%s\t%.15g\n", r, f, l, y, SpecifiedDemandProfile[r, f, l, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param AccumulatedAnnualDemand :=\n" >> ParameterSelres;
+	printf {r in REGION, f in FUEL, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, f, y, AccumulatedAnnualDemand[r, f, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param CapacityToActivityUnit :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY}: "\t%s\t%s\t%.15g\n", r, t, CapacityToActivityUnit[r, t] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param TechWithCapacityNeededToMeetPeakTS :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY}: "\t%s\t%s\t%.15g\n", r, t, TechWithCapacityNeededToMeetPeakTS[r, t] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param CapacityFactor :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY, l in TIMESLICE, y in YEAR}: "\t%s\t%s\t%s\t%s\t%.15g\n", r, t, l, y, CapacityFactor[r, t, l, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param AvailabilityFactor :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, t, y, AvailabilityFactor[r, t, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param OperationalLife :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY}: "\t%s\t%s\t%.15g\n", r, t, OperationalLife[r, t] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param ResidualCapacity :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, t, y, ResidualCapacity[r, t, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param InputActivityRatio :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY, f in FUEL, m in MODE_OF_OPERATION, y in YEAR}: "\t%s\t%s\t%s\t%s\t%s\t%.15g\n", r, t, f, m, y, InputActivityRatio[r, t, f, m, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param OutputActivityRatio :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY, f in FUEL, m in MODE_OF_OPERATION, y in YEAR}: "\t%s\t%s\t%s\t%s\t%s\t%.15g\n", r, t, f, m, y, OutputActivityRatio[r, t, f, m, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param CapitalCost :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, t, y, CapitalCost[r, t, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param VariableCost :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY, m in MODE_OF_OPERATION, y in YEAR}: "\t%s\t%s\t%s\t%s\t%.15g\n", r, t, m, y, VariableCost[r, t, m, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param FixedCost :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, t, y, FixedCost[r, t, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param TechnologyStorage :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY, s in STORAGE, m in MODE_OF_OPERATION}: "\t%s\t%s\t%s\t%s\t%.15g\n", r, t, s, m, TechnologyStorage[r, t, s, m] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param StorageMaxChargeRate :=\n" >> ParameterSelres;
+	printf {r in REGION, s in STORAGE}: "\t%s\t%s\t%.15g\n", r, s, StorageMaxChargeRate[r, s] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param StorageMaxDischargeRate :=\n" >> ParameterSelres;
+	printf {r in REGION, s in STORAGE}: "\t%s\t%s\t%.15g\n", r, s, StorageMaxDischargeRate[r, s] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param MinStorageCharge :=\n" >> ParameterSelres;
+	printf {r in REGION, s in STORAGE, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, s, y, MinStorageCharge[r, s, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param OperationalLifeStorage :=\n" >> ParameterSelres;
+	printf {r in REGION, s in STORAGE}: "\t%s\t%s\t%.15g\n", r, s, OperationalLifeStorage[r, s] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param CapitalCostStorage :=\n" >> ParameterSelres;
+	printf {r in REGION, s in STORAGE, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, s, y, CapitalCostStorage[r, s, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param ResidualStorageCapacity :=\n" >> ParameterSelres;
+	printf {r in REGION, s in STORAGE, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, s, y, ResidualStorageCapacity[r, s, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param StorageMaxCapacity :=\n" >> ParameterSelres;
+	printf {r in REGION, s in STORAGE, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, s, y, StorageMaxCapacity[r, s, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param CapacityOfOneTechnologyUnit :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, t, y, CapacityOfOneTechnologyUnit[r, t, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param TotalAnnualMaxCapacity :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, t, y, TotalAnnualMaxCapacity[r, t, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param TotalAnnualMinCapacity :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, t, y, TotalAnnualMinCapacity[r, t, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param TotalAnnualMaxCapacityInvestment :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, t, y, TotalAnnualMaxCapacityInvestment[r, t, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param TotalAnnualMinCapacityInvestment :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, t, y, TotalAnnualMinCapacityInvestment[r, t, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param TotalTechnologyAnnualActivityUpperLimit :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, t, y, TotalAnnualMinCapacityInvestment[r, t, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param TotalTechnologyAnnualActivityLowerLimit :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, t, y, TotalTechnologyAnnualActivityLowerLimit[r, t, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param TotalTechnologyModelPeriodActivityUpperLimit :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY}: "\t%s\t%s\t%.15g\n", r, t, TotalTechnologyModelPeriodActivityUpperLimit[r, t] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param TotalTechnologyModelPeriodActivityLowerLimit :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY}: "\t%s\t%s\t%.15g\n", r, t, TotalTechnologyModelPeriodActivityLowerLimit[r, t] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param ReserveMarginTagTechnology :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, t, y, ReserveMarginTagTechnology[r, t, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param ReserveMarginTagFuel :=\n" >> ParameterSelres;
+	printf {r in REGION, f in FUEL, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, f, y, ReserveMarginTagFuel[r, f, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param ReserveMargin :=\n" >> ParameterSelres;
+	printf {r in REGION, y in YEAR}: "\t%s\t%s\t%.15g\n", r, y, ReserveMargin[r, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param RETagTechnology :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, t, y, RETagTechnology[r, t, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param RETagFuel :=\n" >> ParameterSelres;
+	printf {r in REGION, f in FUEL, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, f, y, RETagFuel[r, f, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param REMinProductionTarget :=\n" >> ParameterSelres;
+	printf {r in REGION, y in YEAR}: "\t%s\t%s\t%.15g\n", r, y, REMinProductionTarget[r, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param EmissionActivityRatio :=\n" >> ParameterSelres;
+	printf {r in REGION, t in TECHNOLOGY, e in EMISSION, m in MODE_OF_OPERATION, y in YEAR}:
+			"\t%s\t%s\t%s\t%s\t%s\t%.15g\n", r, t, e, m, y, EmissionActivityRatio[r, t, e, m, y]
+			>> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param EmissionsPenalty :=\n" >> ParameterSelres;
+	printf {r in REGION, e in EMISSION, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, e, y, EmissionsPenalty[r, e, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param AnnualExogenousEmission :=\n" >> ParameterSelres;
+	printf {r in REGION, e in EMISSION, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, e, y, AnnualExogenousEmission[r, e, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param AnnualEmissionLimit :=\n" >> ParameterSelres;
+	printf {r in REGION, e in EMISSION, y in YEAR}: "\t%s\t%s\t%s\t%.15g\n", r, e, y, AnnualEmissionLimit[r, e, y] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param ModelPeriodExogenousEmission :=\n" >> ParameterSelres;
+	printf {r in REGION, e in EMISSION}: "\t%s\t%s\t%.15g\n", r, e, ModelPeriodExogenousEmission[r, e] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+	printf "param ModelPeriodEmissionLimit :=\n" >> ParameterSelres;
+	printf {r in REGION, e in EMISSION}: "\t%s\t%s\t%.15g\n", r, e, ModelPeriodEmissionLimit[r, e] >> ParameterSelres;
+	printf ";\n\n" >> ParameterSelres;
+
+/* Variable Printout */
+	printf "param StorageLevelStart \t := \n" >> VariableSelres;
+	printf {r in REGION, s in STORAGE}: 
+		"\t %s \t %s \t %.15g\n", r, s, StorageLevelStart[r, s] >> VariableSelres;
+	printf ";\n\n" >> VariableSelres;
+
+	printf "param StorageLevelTSStart \t :=\n" >> VariableSelres;
+	printf {r in REGION, s in STORAGE, l in TIMESLICE, y in YEAR}: 
+		"\t %s \t %s \t %s \t %s \t %.15g\n", 
+		r, s, l, y, StorageLevelTSStart[r, s, l, y] >> VariableSelres;
+	printf ";\n\n" >> VariableSelres;
+
+	printf "param NewStorageCapacity \t :=\n" >> VariableSelres;
+	printf {r in REGION, s in STORAGE, y in YEAR}:
+		"\t %s \t %s \t %s \t %.15g\n", 
+		r, s, y, NewStorageCapacity[r, s, y] >> VariableSelres;
+	printf ";\n\n" >> VariableSelres;
+
+	printf "param SalvageValueStorage \t :=\n" >> VariableSelres;
+	printf {r in REGION, s in STORAGE, y in YEAR}:
+		"\t %s \t %s \t %s \t %.15g\n", r, s, y, 
+		SalvageValueStorage[r, s, y] >> VariableSelres;
+	printf ";\n\n" >> VariableSelres;
+
+	printf "param StorageLevelYearStart \t :=\n" >> VariableSelres;
+	printf {r in REGION, s in STORAGE, y in YEAR}: 
+		"\t %s \t %s \t %s \t %.15g\n", r, s, y, StorageLevelYearStart[r, s, y] >> VariableSelres;
+	printf ";\n\n" >> VariableSelres;
+
+	printf "param StorageLevelYearFinish \t :=\n" >> VariableSelres;
+	printf {r in REGION, s in STORAGE, y in YEAR}: 
+		"\t %s \t %s \t %s \t %.15g\n", r, s, y, StorageLevelYearFinish[r, s, y] >> VariableSelres ;
+	printf ";\n\n" >> VariableSelres;
+
+	printf "param StorageLevelSeasonStart \t :=\n" >> VariableSelres;
+	printf {r in REGION, s in STORAGE, ls in SEASON, y in YEAR}: 
+		"\t %s \t %s \t %s \t %s \t %.15g\n", 
+		r, s, ls, y, StorageLevelSeasonStart[r, s, ls, y] >> VariableSelres ;
+	printf ";\n\n" >> VariableSelres;
+
+	printf "param StorageLevelDayTypeStart \t :=\n" >> VariableSelres;
+	printf {r in REGION, s in STORAGE, ls in SEASON, ld in DAYTYPE, y in YEAR}:
+		"\t %s \t %s \t %s \t %s \t %s \t %.15g\n", 
+		r, s, ls, ld, y, StorageLevelDayTypeStart[r, s, ls, ld, y] >> VariableSelres;
+	printf ";\n\n" >> VariableSelres;
+
+	printf "param StorageLevelDayTypeFinish \t :=\n" >> VariableSelres;
+	printf {r in REGION, s in STORAGE, ls in SEASON, ld in DAYTYPE, y in YEAR}:
+		"\t %s \t %s \t %s \t %s \t %s \t .15g\n", r, s, ls, ld, y, 
+		StorageLevelDayTypeFinish[r, s, ls, ld, y] >> VariableSelres;
+	printf ";\n\n" >> VariableSelres;
+
+	printf "param NumberOfNewTechnologyUnits \t :=\n" >> VariableSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: 
+		"\t %s \t %s \t %s \t %.15g\n", r, t, y, 
+		NumberOfNewTechnologyUnits[r, t, y] >> VariableSelres;
+	printf ";\n\n" >> VariableSelres;
+
+	printf "param NewCapacity \t :=\n" >> VariableSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: 
+		"\t %s \t %s \t %s \t %.15g\n", r, t, y, NewCapacity[r, t, y] >> VariableSelres;
+	printf ";\n\n" >> VariableSelres;
+
+	printf "param RateOfActivity \t :=\n" >> VariableSelres;
+	printf {r in REGION, l in TIMESLICE, t in TECHNOLOGY, m in MODE_OF_OPERATION, y in YEAR}:
+		"\t %s \t %s \t %s \t %s \t %s \t %.15g\n",
+		r, l, t, m, y, RateOfActivity[r, l, t, m, y] >> VariableSelres;
+	printf ";\n\n" >> VariableSelres;
+
+	printf "param UseByTechnology \t :=\n" >> VariableSelres;
+	printf {r in REGION, l in TIMESLICE, t in TECHNOLOGY, f in FUEL, y in YEAR}: 
+		"\t %s \t %s \t %s \t %s \t %s \t %.15g\n", r, l, t, f, y,
+		UseByTechnology[r, l, t, f, y] >> VariableSelres;
+	printf ";\n\n" >> VariableSelres;
+
+	printf "param Trade \t :=\n" >> VariableSelres;
+	printf {r in REGION, rr in REGION, l in TIMESLICE, f in FUEL, y in YEAR}:
+		"\t %s \t %s \t %s \t %s \t %s \t %s \t %.15g\n", r, rr, l, f, y,
+		Trade[r, rr, l, f, y] >> VariableSelres;
+	printf ";\n\n" >> VariableSelres;
+
+	printf "param UseAnnual \t :=\n" >> VariableSelres;
+	printf {r in REGION, f in FUEL, y in YEAR}:
+		"\t %s \t %s \t %s \t %.15g\n", r, f, y, 
+		UseAnnual[r, f, y] >> VariableSelres;
+	printf ";\n\n" >> VariableSelres;
+	
+	printf "param VariableOperatingCost \t :=\n" >> VariableSelres;
+	printf {r in REGION, t in TECHNOLOGY, l in TIMESLICE, y in YEAR}: 
+		"\t %s \t %s \t %s \t %s \t %.15g\n", r, t, l, y, 
+		VariableOperatingCost[r, t, l, y] >> VariableSelres;
+	printf ";\n\n" >> VariableSelres;
+
+	printf "param SalvageValue \t :=\n" >> VariableSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: 
+		"\t %s \t %s \t %s \t %.15g\n", r, t, y, 
+		SalvageValue[r, t, y] >> VariableSelres;
+	printf ";\n\n" >> VariableSelres;
+
+	printf "param DiscountedSalvageValue \t :=\n" >> VariableSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: 
+		"\t %s \t %s \t %s \t %.15g\n", r, t, y, 
+		DiscountedSalvageValue[r, t, y] >> VariableSelres;
+	printf ";\n\n" >> VariableSelres;
+
+	printf "param OperatingCost \t :=\n" >> VariableSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: 
+		"\t %s \t %s \t %s \t %.15g\n", r, t, y, 
+		OperatingCost[r, t, y] >> VariableSelres;
+	printf ";\n\n" >> VariableSelres;
+
+	printf "param DiscountedTechnologyEmissionsPenalty \t :=\n" >> VariableSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: 
+		"\t %s \t %s \t %s \t %.15g\n", r, t, y,
+		DiscountedTechnologyEmissionsPenalty[r, t, y] >> VariableSelres;
+	printf ";\n\n" >> VariableSelres;
+
+	printf "param ModelPeriodEmissions \t :=\n" >> VariableSelres;
+	printf {r in REGION, e in EMISSION}: 
+		"\t %s \t %s \t %.15g\n", r, e, ModelPeriodEmissions[r, e] >> VariableSelres;
+	printf ";\n\n" >> VariableSelres;
+
+
+/* Constraint Printout */
+	printf "CAa4_Constraint_Capacity\n" > ConstraintSelres;
+	printf {r in REGION, l in TIMESLICE, t in TECHNOLOGY, y in YEAR: TechWithCapacityNeededToMeetPeakTS[r,t]<>0}: 
+		"\t(%s\t%s\t%s\t%s) %.15g %.15g\n", r, l, t, y,
+		sum{m in MODE_OF_OPERATION} RateOfActivity[r,l,t,m,y], 
+		(
+			(
+				(sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0} NewCapacity[r,t,yy]) + 
+				ResidualCapacity[r,t,y]
+			) * CapacityFactor[r,t,l,y] * CapacityToActivityUnit[r,t]
+		)
+		>> ConstraintSelres
+	;
+
+	printf "CAa4b_Constraint_Capacity\n" >> ConstraintSelres;
+	printf {r in REGION, l in TIMESLICE, t in TECHNOLOGY, y in YEAR: TechWithCapacityNeededToMeetPeakTS[r,t]<>0}: 
+		"\t(%s\t%s\t%s\t%s), %.15g, %.15g\n",
+		r, l, t, y,
+		sum{m in MODE_OF_OPERATION} RateOfActivity[r,l,t,m,y],
+		(
+			(-1) * 
+			(
+				(
+					sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0} 
+					NewCapacity[r,t,yy]
+				) + ResidualCapacity[r,t,y]
+			) * CapacityFactor[r,t,l,y] * CapacityToActivityUnit[r,t]
+		)
+		>> ConstraintSelres
+	;
+
+	printf "CAa5_TotalNewCapacity\n" >> ConstraintSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR: CapacityOfOneTechnologyUnit[r,t,y]<>0}: 
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, t, y,
+		(CapacityOfOneTechnologyUnit[r,t,y] * NumberOfNewTechnologyUnits[r,t,y]),
+		(NewCapacity[r,t,y])
+		>> ConstraintSelres
+	;
+
+	printf "CAb1_PlannedMaintenance\n" >> ConstraintSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}:
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, t, y,
+		(
+			sum{l in TIMESLICE} sum{m in MODE_OF_OPERATION} 
+			RateOfActivity[r,l,t,m,y] * YearSplit[l,y] 
+		),
+		(
+			sum{l in TIMESLICE} 
+			(
+				(
+					(
+						sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0} NewCapacity[r,t,yy]
+					) + ResidualCapacity[r,t,y]
+				) * CapacityFactor[r,t,l,y]*YearSplit[l,y]
+			) * AvailabilityFactor[r,t,y] * CapacityToActivityUnit[r,t]
+		)
+		>> ConstraintSelres
+	;
+
+	printf "CAb1_PlannedMaintenance_Negative\n" >> ConstraintSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}:
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, t, y,
+		(
+			sum{l in TIMESLICE} sum{m in MODE_OF_OPERATION} 
+			RateOfActivity[r,l,t,m,y]*YearSplit[l,y]
+		),
+		(
+			sum{l in TIMESLICE} (-1)*
+			(
+				(
+					(
+						sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0} 
+						NewCapacity[r,t,yy]
+					) + ResidualCapacity[r,t,y]
+				) * CapacityFactor[r,t,l,y]*YearSplit[l,y]
+			) * AvailabilityFactor[r,t,y] * CapacityToActivityUnit[r,t]
+		)
+		>> ConstraintSelres
+	;
+
+	printf "EBa10_EnergyBalanceEachTS4\n" >> ConstraintSelres;
+	printf {r in REGION, rr in REGION, l in TIMESLICE, f in FUEL, y in YEAR}:
+		"\t(%s\t%s\t%s\t%s\t%s), %.15g, %.15g\n", r, rr, l, f, y,
+		(Trade[r,rr,l,f,y]),
+		(-Trade[rr,r,l,f,y])
+		>> ConstraintSelres
+	;
+
+	printf "EBa11_EnergyBalanceEachTS5\n" >> ConstraintSelres;
+	printf {r in REGION, l in TIMESLICE, f in FUEL, y in YEAR}: 
+		"\t(%s\t%s\t%s\t%s), %.15g, %.15g\n", r, l, f, y,
+		(
+			sum{m in MODE_OF_OPERATION, t in TECHNOLOGY: OutputActivityRatio[r,t,f,m,y] <>0} 
+			RateOfActivity[r,l,t,m,y] * OutputActivityRatio[r,t,f,m,y] *
+			YearSplit[l,y]
+		),
+		(
+			SpecifiedAnnualDemand[r,f,y] * SpecifiedDemandProfile[r,f,l,y] + 
+			sum{m in MODE_OF_OPERATION, t in TECHNOLOGY: InputActivityRatio[r,t,f,m,y]<>0} 
+			RateOfActivity[r,l,t,m,y] * InputActivityRatio[r,t,f,m,y] * 
+			YearSplit[l,y] + sum{rr in REGION} Trade[r,rr,l,f,y] * TradeRoute[r,rr,f,y]
+		)
+		>> ConstraintSelres
+	;
+
+	printf "EBb4_EnergyBalanceEachYear4\n" >> ConstraintSelres;
+	printf {r in REGION, f in FUEL, y in YEAR}: 
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, f, y,
+		(
+			sum{m in MODE_OF_OPERATION, t in TECHNOLOGY, l in TIMESLICE: OutputActivityRatio[r,t,f,m,y] <>0} 
+			RateOfActivity[r,l,t,m,y] * OutputActivityRatio[r,t,f,m,y] * YearSplit[l,y]
+		),
+		(
+			sum{m in MODE_OF_OPERATION, t in TECHNOLOGY, l in TIMESLICE: InputActivityRatio[r,t,f,m,y]<>0} 
+			RateOfActivity[r,l,t,m,y] * InputActivityRatio[r,t,f,m,y] * YearSplit[l,y] + 
+			sum{l in TIMESLICE, rr in REGION} 
+			Trade[r,rr,l,f,y]*TradeRoute[r,rr,f,y] + AccumulatedAnnualDemand[r,f,y]
+		)
+		>> ConstraintSelres
+	;
+
+	printf "S1_StorageLevelYearStart\n" >> ConstraintSelres;
+	printf {r in REGION, s in STORAGE, y in YEAR}:
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, s, y,
+		(
+			if y = min{yy in YEAR} min(yy) then StorageLevelStart[r,s]
+			else StorageLevelYearStart[r,s,y-1] + (-1) * 
+			(
+				sum{l in TIMESLICE} 
+				(
+					sum{t in TECHNOLOGY, m in MODE_OF_OPERATION:TechnologyStorage[r,t,s,m]>0} 
+					(
+						RateOfActivity[r,l,t,m,y-1] * TechnologyStorage[r,t,s,m]
+					)
+				) * YearSplit[l,y-1]
+			)
+		),
+		(StorageLevelYearStart[r,s,y])
+		>> ConstraintSelres
+	;
+
+	printf "StorageLevelTSStart\n" >> ConstraintSelres;
+	printf {r in REGION, s in STORAGE, l in TIMESLICE, y in YEAR}: 
+		"\t(%s\t%s\t%s\t%s), %.15g, %.15g\n", r, s, l, y,
+		(
+			if l = min{ll in TIMESLICE} min(ll) then StorageLevelYearStart[r,s,y] 
+			else StorageLevelTSStart[r,s,l-1,y] + (-1) * 
+			(
+				(
+					(
+						sum{t in TECHNOLOGY, m in MODE_OF_OPERATION:TechnologyStorage[r,t,s,m]>0} 
+						RateOfActivity[r,l-1,t,m,y] * TechnologyStorage[r,t,s,m]
+					)
+				) * YearSplit[l-1,y]
+			)
+		),
+		(StorageLevelTSStart[r,s,l,y])
+		>> ConstraintSelres
+	;
+
+	printf "SC8_StorageRefilling\n" >> ConstraintSelres;
+	printf {s in STORAGE, r in REGION}:
+		"\t(%s\t%s), %.15g, %.15g\n", s, r,
+		(
+			sum{y in YEAR, l in TIMESLICE}  
+			(-1) * 
+			(
+				sum{t in TECHNOLOGY, m in MODE_OF_OPERATION:TechnologyStorage[r,t,s,m]>0}
+				(
+					RateOfActivity[r,l,t,m,y] * TechnologyStorage[r,t,s,m]
+				)
+			) * YearSplit[l,y]
+		),
+		0
+		>> ConstraintSelres
+	;
+
+	printf "SC9_StopModeLeakage\n" >> ConstraintSelres;
+	printf {r in REGION, l in TIMESLICE, y in YEAR,m in MODE_OF_OPERATION,t in TECHNOLOGY, s in STORAGE: TechnologyStorage[r,t,s,1] == 1 && m != min{mm in MODE_OF_OPERATION} min(mm)}: 
+		"\t(%s\t%s\t%s\t%s\t%s\t%s), %.15g, %.15g\n", r, l, y, m, t, s,
+		RateOfActivity[r,l,t,m,y],
+		0
+		>> ConstraintSelres
+	;
+
+	printf "NonStorageConstraint\n" >> ConstraintSelres;
+	printf {r in REGION, l in TIMESLICE, t in TECHNOLOGY, m in MODE_OF_OPERATION, y in YEAR}: 
+		"\t(%s\t%s\t%s\t%s\t%s), %.15g, %.15g\n", r, l, t, m, y,
+		(
+			if sum{s in STORAGE} TechnologyStorage[r,t,s,m] == 0 then RateOfActivity[r,l,t,m,y]
+		),
+		0
+		>> ConstraintSelres
+	;
+
+	printf "SC1_LowerLimit\n" >> ConstraintSelres;
+	printf {r in REGION, s in STORAGE, l in TIMESLICE, y in YEAR}:
+		"\t(%s\t%s\t%s\t%s), %.15g, %.15g\n", r, s, l, y,
+		(
+			MinStorageCharge[r,s,y] * 
+			(
+				sum{yy in YEAR: y-yy < OperationalLifeStorage[r,s] && y-yy>=0} 
+				NewStorageCapacity[r,s,yy]+ResidualStorageCapacity[r,s,y]
+			)
+		),
+		StorageLevelTSStart[r,s,l,y]
+		>> ConstraintSelres
+	;
+
+	printf "SC1a_LowerLimitEndofModelPeriod\n" >> ConstraintSelres;
+	printf {s in STORAGE, y in YEAR, r in REGION}:
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", s, y, r,
+		(
+			MinStorageCharge[r,s,y] * 
+			(
+				sum{yy in YEAR: y-yy < OperationalLifeStorage[r,s] && y-yy>=0} 
+				NewStorageCapacity[r,s,yy]+ResidualStorageCapacity[r,s,y]
+			)
+		),
+		(
+			StorageLevelTSStart[r,s,max{ll in TIMESLICE} max(ll),y] + 
+			(-1) *
+			(
+				(
+					(
+						sum{m in MODE_OF_OPERATION, t in TECHNOLOGY:TechnologyStorage[r,t,s,m]>0} 
+						RateOfActivity[r,max{ll in TIMESLICE} max(ll),t,m,y] * TechnologyStorage[r,t,s,m]
+					)
+				) * YearSplit[max{ll in TIMESLICE} max(ll),y]
+			)
+		)
+		>> ConstraintSelres
+	;
+
+	printf "SC2_UpperLimit\n" >> ConstraintSelres;
+	printf {r in REGION, s in STORAGE, l in TIMESLICE, y in YEAR}:
+		"\t(%s\t%s\t%s\t%s), %.15g, %.15g\n", r, s, l, y,
+		(StorageLevelTSStart[r,s,l,y]),
+		(
+			sum{yy in YEAR: y-yy < OperationalLifeStorage[r,s] && y-yy>=0} 
+			NewStorageCapacity[r,s,yy]+ResidualStorageCapacity[r,s,y]
+		)
+		>> ConstraintSelres
+	;
+
+	printf "SC2a_UpperLimitEndofModelPeriod\n" >> ConstraintSelres;
+	printf {s in STORAGE, y in YEAR, r in REGION}:
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", s, y, r,
+		(
+			StorageLevelTSStart[r,s,max{ll in TIMESLICE} max(ll),y] + 
+			(-1) * 
+			(
+				(
+					(
+						sum{m in MODE_OF_OPERATION, t in TECHNOLOGY:TechnologyStorage[r,t,s,m]>0} 
+						RateOfActivity[r,max{ll in TIMESLICE} max(ll),t,m,y] * TechnologyStorage[r,t,s,m]
+					)
+				) * YearSplit[max{ll in TIMESLICE} max(ll),y]
+			)
+		),
+		(
+			sum{yy in YEAR: y-yy < OperationalLifeStorage[r,s] && y-yy>=0} 
+			NewStorageCapacity[r,s,yy] + ResidualStorageCapacity[r,s,y]
+		)
+		>> ConstraintSelres
+	;
+
+	printf "SC2a_UpperLimitEndofModelPeriod_Negative\n" >> ConstraintSelres;
+	printf {s in STORAGE, y in YEAR, r in REGION}:
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", s, y, r,
+		(
+			StorageLevelTSStart[r,s,max{ll in TIMESLICE} max(ll),y] + 
+			(-1) * 
+			(
+				(
+					(
+						sum{m in MODE_OF_OPERATION, t in TECHNOLOGY:TechnologyStorage[r,t,s,m]>0} 
+						RateOfActivity[r,max{ll in TIMESLICE} max(ll),t,m,y] * 
+						TechnologyStorage[r,t,s,m]
+					)
+				) * YearSplit[max{ll in TIMESLICE} max(ll),y]
+			)
+		),
+		(
+			(-1)*
+			(
+				sum{yy in YEAR: y-yy < OperationalLifeStorage[r,s] && y-yy>=0} 
+				NewStorageCapacity[r,s,yy]+ResidualStorageCapacity[r,s,y]
+			)
+		)
+		>> ConstraintSelres
+	;
+
+	printf "SC7_StorageMaxUpperLimit\n" >> ConstraintSelres;
+	printf {s in STORAGE, y in YEAR, r in REGION}:
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", s, y, r,
+		(
+			sum{yy in YEAR: y-yy < OperationalLifeStorage[r,s] && y-yy>=0} 
+			NewStorageCapacity[r,s,yy]+ResidualStorageCapacity[r,s,y]
+		),
+		StorageMaxCapacity[r, s, y]
+		>> ConstraintSelres
+	;
+
+	printf "SI6_SalvageValueStorageAtEndOfPeriod1\n" >> ConstraintSelres;
+	printf {r in REGION, s in STORAGE, y in YEAR: (y+OperationalLifeStorage[r,s]-1) <= (max{yy in YEAR} max(yy))}:
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, s, y,
+		0,
+		SalvageValueStorage[r,s,y]
+		>> ConstraintSelres
+	;
+
+	printf "SI7_SalvageValueStorageAtEndOfPeriod2\n" >> ConstraintSelres;
+	printf {r in REGION, s in STORAGE, y in YEAR: (DepreciationMethod[r]=1 && (y+OperationalLifeStorage[r,s]-1) > (max{yy in YEAR} max(yy)) && DiscountRate[r]=0) || (DepreciationMethod[r]=2 && (y+OperationalLifeStorage[r,s]-1) > (max{yy in YEAR} max(yy)))}: 
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, s, y,
+		(
+			CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y] * 
+			(
+				1-(max{yy in YEAR} max(yy) - y+1)/OperationalLifeStorage[r,s]
+			)
+		),
+		SalvageValueStorage[r,s,y]
+		>> ConstraintSelres
+	;
+
+	printf "SI8_SalvageValueStorageAtEndOfPeriod3\n" >> ConstraintSelres;
+	printf {r in REGION, s in STORAGE, y in YEAR: DepreciationMethod[r]=1 && (y+OperationalLifeStorage[r,s]-1) > (max{yy in YEAR} max(yy)) && DiscountRate[r]>0}: 
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, s, y,
+		(
+			CapitalCostStorage[r,s,y] * NewStorageCapacity[r,s,y] * 
+			(
+				1 - 
+				(
+					(
+						(
+							1+DiscountRate[r]
+						)
+						^ (max{yy in YEAR} max(yy) - y + 1) -1
+					)
+					/
+					((1+DiscountRate[r]) ^ OperationalLifeStorage[r,s] - 1)
+				)
+			)
+		),
+		SalvageValueStorage[r,s,y]
+		>> ConstraintSelres
+	;
+
+	printf "SV1_SalvageValueAtEndOfPeriod1\n" >> ConstraintSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR: DepreciationMethod[r]=1 && (y + OperationalLife[r,t]-1) > (max{yy in YEAR} max(yy)) && DiscountRate[r]>0}:
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, t, y,
+		SalvageValue[r,t,y],
+		(
+			CapitalCost[r,t,y] * NewCapacity[r,t,y] * 
+			(
+				1 - 
+				(
+					(
+						(1+DiscountRate[r]) ^ (max{yy in YEAR} max(yy) - y+1) - 1
+					) /
+					(
+						(1+DiscountRate[r]) ^ OperationalLife[r,t]-1
+					)
+				)
+			)
+		)
+		>> ConstraintSelres
+	;
+
+	printf "SV2_SalvageValueAtEndOfPeriod2\n" >> ConstraintSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR: DepreciationMethod[r]=1 && (y + OperationalLife[r,t]-1) > (max{yy in YEAR} max(yy)) && DiscountRate[r]=0 || (DepreciationMethod[r]=2 && (y + OperationalLife[r,t]-1) > (max{yy in YEAR} max(yy)))}: 
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, t, y,
+		SalvageValue[r,t,y],
+		(
+			CapitalCost[r,t,y] * NewCapacity[r,t,y] * 
+			(
+				1-(max{yy in YEAR} max(yy) - y+1)/OperationalLife[r,t]
+			)
+		)
+		>> ConstraintSelres
+	;
+
+	printf "SV3_SalvageValueAtEndOfPeriod3\n" >> ConstraintSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR: (y + OperationalLife[r,t]-1) <= (max{yy in YEAR} max(yy))}: 
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, t, y,
+		SalvageValue[r,t,y],
+		0
+		>> ConstraintSelres
+	;
+
+	printf "SV4_SalvageValueDiscountedToStartYear\n" >> ConstraintSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}:
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, t, y,
+		DiscountedSalvageValue[r,t,y],
+		(
+			SalvageValue[r,t,y] / 
+			(
+				(1+DiscountRate[r]) ^ (1+max{yy in YEAR} max(yy)-min{yy in YEAR} min(yy))
+			)
+		)
+		>> ConstraintSelres
+	;
+
+	printf "TCC1_TotalAnnualMaxCapacityConstraint\n" >> ConstraintSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}:
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, t, y,
+		(
+			(
+				sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0} 
+				NewCapacity[r,t,yy]
+			) + ResidualCapacity[r,t,y]
+		),
+		TotalAnnualMaxCapacity[r,t,y]
+		>> ConstraintSelres
+	;
+
+	printf "TCC2_TotalAnnualMinCapacityConstraint\n" >> ConstraintSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR: TotalAnnualMinCapacity[r,t,y]>0}: 
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, t, y,
+		(
+			(
+				sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0} 
+				NewCapacity[r,t,yy]
+			)
+			+ ResidualCapacity[r,t,y]
+		),
+		TotalAnnualMinCapacity[r,t,y]
+		>> ConstraintSelres
+	;
+
+	printf "NCC1_TotalAnnualMaxNewCapacityConstraint\n" >> ConstraintSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}:
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, t, y,
+		NewCapacity[r,t,y],
+		TotalAnnualMaxCapacityInvestment[r,t,y]
+		>> ConstraintSelres
+	;
+
+	printf "NCC2_TotalAnnualMinNewCapacityConstraint\n" >> ConstraintSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR: TotalAnnualMinCapacityInvestment[r,t,y]>0}: 
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, t, y,
+		NewCapacity[r,t,y],
+		TotalAnnualMinCapacityInvestment[r,t,y]
+		>> ConstraintSelres
+	;
+
+	printf "AAC2_TotalAnnualTechnologyActivityUpperLimit\n" >> ConstraintSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}:
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, t, y,
+		(
+			sum{l in TIMESLICE, m in MODE_OF_OPERATION} 
+			RateOfActivity[r,l,t,m,y] * YearSplit[l,y]
+		),
+		TotalTechnologyAnnualActivityUpperLimit[r,t,y]
+		>> ConstraintSelres
+	;
+
+	printf "AAC3_TotalAnnualTechnologyActivityLowerLimit\n" >> ConstraintSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: 
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, t, y,
+		(
+			sum{l in TIMESLICE, m in MODE_OF_OPERATION} 
+			RateOfActivity[r,l,t,m,y] * YearSplit[l,y]
+		), 
+		TotalTechnologyAnnualActivityLowerLimit[r,t,y]
+		>> ConstraintSelres
+	;
+
+	printf "TAC2_TotalModelHorizonTechnologyActivityUpperLimit\n" >> ConstraintSelres;
+	printf {r in REGION, t in TECHNOLOGY}: 
+		"\t(%s\t%s), %.15g, %.15g\n", r, t,
+		(
+			sum{l in TIMESLICE, m in MODE_OF_OPERATION, y in YEAR} 
+			RateOfActivity[r,l,t,m,y] * YearSplit[l,y]
+		),
+		TotalTechnologyModelPeriodActivityUpperLimit[r,t]
+		>> ConstraintSelres
+	;
+
+	printf "TAC3_TotalModelHorizenTechnologyActivityLowerLimit\n" >> ConstraintSelres;
+	printf {r in REGION, t in TECHNOLOGY}: 
+		"\t(%s\t%s), %.15g, %.15g\n", r, t,
+		(
+			sum{l in TIMESLICE, m in MODE_OF_OPERATION, y in YEAR} 
+			RateOfActivity[r,l,t,m,y] * YearSplit[l,y]
+		),
+		TotalTechnologyModelPeriodActivityLowerLimit[r,t]
+		>> ConstraintSelres
+	;
+
+	printf "RM3_ReserveMargin_Constraint\n" >> ConstraintSelres;
+	printf {r in REGION, l in TIMESLICE, y in YEAR}: 
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, l, y, 
+		(
+			sum{m in MODE_OF_OPERATION, t in TECHNOLOGY, f in FUEL: OutputActivityRatio[r,t,f,m,y] <>0} 
+			RateOfActivity[r,l,t,m,y] * OutputActivityRatio[r,t,f,m,y] * 
+			ReserveMarginTagFuel[r,f,y] * ReserveMargin[r,y]
+		),
+		(
+			sum {t in TECHNOLOGY} 
+			(
+				(
+					sum{yy in YEAR: y-yy < OperationalLife[r,t] && y-yy>=0} 
+					NewCapacity[r,t,yy]
+				) + ResidualCapacity[r,t,y]
+			) * ReserveMarginTagTechnology[r,t,y] * CapacityToActivityUnit[r,t]
+		)
+		>> ConstraintSelres
+	;
+
+	printf "RE4_EnergyConstraint\n" >> ConstraintSelres;
+	printf {r in REGION, y in YEAR}:
+		"\t(%s\t%s), %.15g, %.15g\n", r, y,
+		(
+			REMinProductionTarget[r,y] * 
+			sum{l in TIMESLICE, f in FUEL} 
+			sum{m in MODE_OF_OPERATION, t in TECHNOLOGY: OutputActivityRatio[r,t,f,m,y] <>0}
+			RateOfActivity[r,l,t,m,y] * OutputActivityRatio[r,t,f,m,y] * YearSplit[l,y] * RETagFuel[r,f,y]
+		), 
+		(
+			sum{m in MODE_OF_OPERATION, l in TIMESLICE, t in TECHNOLOGY, f in FUEL: OutputActivityRatio[r,t,f,m,y] <>0} 
+			RateOfActivity[r,l,t,m,y] * OutputActivityRatio[r,t,f,m,y] * YearSplit[l,y] * RETagTechnology[r,t,y]
+		)
+		>> ConstraintSelres
+	;
+
+	printf "E5_DiscountedEmissionsPenaltyByTechnology\n" >> ConstraintSelres;
+	printf {r in REGION, t in TECHNOLOGY, y in YEAR}: 
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, t, y,
+		(
+			sum{e in EMISSION, l in TIMESLICE, m in MODE_OF_OPERATION: EmissionActivityRatio[r,t,e,m,y]<>0} 
+			EmissionActivityRatio[r,t,e,m,y] * RateOfActivity[r,l,t,m,y] * 
+			YearSplit[l,y] * EmissionsPenalty[r,e,y] / 
+			(
+				(1+DiscountRate[r]) ^ (y-min{yy in YEAR} min(yy)+0.5)
+			)
+		),
+		DiscountedTechnologyEmissionsPenalty[r,t,y]
+		>> ConstraintSelres
+	;
+
+	printf "E8_AnnualEmissionsLimit\n" >> ConstraintSelres;
+	printf {r in REGION, e in EMISSION, y in YEAR}:
+		"\t(%s\t%s\t%s), %.15g, %.15g\n", r, e, y,
+		(
+			sum{l in TIMESLICE, t in TECHNOLOGY, m in MODE_OF_OPERATION: EmissionActivityRatio[r,t,e,m,y]<>0} 
+			EmissionActivityRatio[r,t,e,m,y] * RateOfActivity[r,l,t,m,y] * 
+			YearSplit[l,y] + AnnualExogenousEmission[r,e,y]
+		),
+		AnnualEmissionLimit[r,e,y]
+		>> ConstraintSelres
+	;
+
+	printf "E9_ModelPeriodEmissionsLimit\n" >> ConstraintSelres;
+	printf {r in REGION, e in EMISSION}:
+		"\t(%s\t%s), %.15g, %.15g\n", r, e,
+		(
+			sum{l in TIMESLICE, t in TECHNOLOGY, m in MODE_OF_OPERATION, y in YEAR: EmissionActivityRatio[r,t,e,m,y]<>0} 
+			EmissionActivityRatio[r,t,e,m,y] * RateOfActivity[r,l,t,m,y] * 
+			YearSplit[l,y] + ModelPeriodExogenousEmission[r,e]
+		),
+		ModelPeriodEmissionLimit[r,e]
+		>> ConstraintSelres
+	;
+
+solve;
+end;
