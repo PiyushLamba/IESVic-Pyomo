@@ -1,0 +1,325 @@
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Wed Jun 22 10:21:19 2022
+
+Bound infeasibility column 'NewCapacity(Vancouver_hBASEBOARDe_2015)'.
+Presolve time = 0.02 sec. (18.51 ticks)
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Wed Jun 22 10:27:44 2022
+
+Bound infeasibility column 'NewCapacity(Vancouver_hBASEBOARDe_2015)'.
+Presolve time = 0.00 sec. (18.51 ticks)
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Wed Jun 22 10:50:18 2022
+
+Tried aggregator 1 time.
+LP Presolve eliminated 92821 rows and 87974 columns.
+Aggregator did 5256 substitutions.
+Reduced LP has 1405 rows, 2052 columns, and 8950 nonzeros.
+Presolve time = 0.08 sec. (69.01 ticks)
+
+Iteration log . . .
+Iteration:     1    Scaled infeas =      55701874.258872
+Iteration:   191    Scaled infeas =       9893188.668717
+Iteration:   328    Scaled infeas =       3318740.237997
+Iteration:   475    Scaled infeas =        352712.002914
+Switched to devex.
+Iteration:   596    Objective     =        691817.352883
+Iteration:   791    Objective     =          2587.888249
+
+Dual simplex solved model.
+
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Wed Jun 22 12:25:49 2022
+
+Using devex.
+
+Iteration log . . .
+Iteration:     1    Scaled infeas =   74620179101.107773
+Iteration:    27    Scaled infeas =    5941089548.898445
+Iteration:   367    Scaled infeas =           580.582089
+Removing shift (25).
+
+Dual simplex solved model.
+
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Wed Jun 22 12:26:22 2022
+
+Using devex.
+
+Iteration log . . .
+Iteration:     1    Scaled infeas =       1243166.060978
+Iteration:    28    Scaled infeas =          5935.102428
+Iteration:   664    Scaled infeas =             0.053711
+
+Dual simplex solved model.
+
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Wed Jun 22 14:01:32 2022
+
+Bound infeasibility column 'NewCapacity(Vancouver_hBASEBOARDe_2015)'.
+Presolve time = 0.03 sec. (18.51 ticks)
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Wed Jun 22 14:02:45 2022
+
+Bound infeasibility column 'NewCapacity(Vancouver_hBASEBOARDe_2015)'.
+Presolve time = 0.01 sec. (18.51 ticks)
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Wed Jun 22 14:13:51 2022
+
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Thu Jun 23 08:26:37 2022
+
+Bound infeasibility column 'NewCapacity(Vancouver_hBASEBOARDe_2015)'.
+Presolve time = 0.02 sec. (18.53 ticks)
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Thu Jun 23 08:27:13 2022
+
+Tried aggregator 1 time.
+LP Presolve eliminated 92803 rows and 87956 columns.
+Aggregator did 5256 substitutions.
+Reduced LP has 1405 rows, 2052 columns, and 8950 nonzeros.
+Presolve time = 0.06 sec. (69.00 ticks)
+
+Iteration log . . .
+Iteration:     1    Scaled infeas =      55701874.258872
+Iteration:   191    Scaled infeas =       9893188.668717
+Iteration:   328    Scaled infeas =       3318740.237997
+Iteration:   475    Scaled infeas =        352712.002914
+Switched to devex.
+Iteration:   596    Objective     =        691808.666883
+Iteration:   791    Objective     =          2579.202249
+
+Dual simplex solved model.
+
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Thu Jun 30 11:42:03 2022
+
+Bound infeasibility column 'NewCapacity(Vancouver_hBASEBOARDe_2015)'.
+Presolve time = 0.02 sec. (18.51 ticks)
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Thu Jun 30 11:46:17 2022
+
+Tried aggregator 1 time.
+LP Presolve eliminated 92827 rows and 87980 columns.
+Aggregator did 5280 substitutions.
+Reduced LP has 1405 rows, 2052 columns, and 8950 nonzeros.
+Presolve time = 0.09 sec. (69.04 ticks)
+
+Iteration log . . .
+Iteration:     1    Scaled infeas =      55701874.258872
+Iteration:   191    Scaled infeas =       9893188.668717
+Iteration:   328    Scaled infeas =       3318740.237997
+Iteration:   475    Scaled infeas =        352712.002914
+Switched to devex.
+Iteration:   596    Objective     =        691817.352883
+Iteration:   791    Objective     =          2587.888249
+
+Dual simplex solved model.
+
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Thu Jun 30 13:21:22 2022
+
+Using devex.
+
+Iteration log . . .
+Iteration:     1    Scaled infeas =   74620179101.107773
+Iteration:    27    Scaled infeas =    5941089548.898445
+
+Dual simplex solved model.
+
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Thu Jun 30 13:21:43 2022
+
+Using devex.
+
+Iteration log . . .
+Iteration:     1    Scaled infeas =       1243166.060978
+Iteration:    28    Scaled infeas =          5935.102428
+Iteration:   664    Scaled infeas =             0.053711
+
+Dual simplex solved model.
+
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Thu Jun 30 13:45:53 2022
+
+Using devex.
+
+Iteration log . . .
+Iteration:     1    Scaled infeas =       6119789.842894
+Iteration:     8    Scaled infeas =       1393256.373154
+Iteration:   368    Scaled infeas =           581.725690
+
+Primal simplex solved model.
+
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Thu Jun 30 13:47:23 2022
+
+Using devex.
+
+Iteration log . . .
+Iteration:     1    Scaled infeas =           885.822364
+
+Dual simplex solved model.
+
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Thu Jun 30 13:56:06 2022
+
+Using devex.
+
+Iteration log . . .
+Iteration:     1    Scaled infeas =          2455.754810
+
+Dual simplex solved model.
+
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Thu Jun 30 13:58:45 2022
+
+
+Iteration log . . .
+Iteration:     1    Scaled infeas =          1695.278507
+Switched to devex.
+Iteration:    27    Objective     =            10.387229
+
+Dual simplex solved model.
+
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Thu Jun 30 14:01:00 2022
+
+
+Iteration log . . .
+Iteration:     1    Scaled infeas =             7.063000
+Switched to devex.
+
+Dual simplex solved model.
+
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Thu Jun 30 14:02:03 2022
+
+
+Iteration log . . .
+Iteration:     1    Scaled infeas =             7.063000
+Switched to devex.
+
+Dual simplex solved model.
+
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Thu Jun 30 14:14:04 2022
+
+
+Iteration log . . .
+Iteration:     1    Scaled infeas =             7.063000
+
+Dual simplex solved model.
+
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Mon Jul  4 14:01:32 2022
+
+Bound infeasibility column 'NewCapacity(Vancouver_hBASEBOARDe_2015)'.
+Presolve time = 0.02 sec. (18.51 ticks)
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Mon Jul 11 15:35:49 2022
+
+Bound infeasibility column 'NewCapacity(Vancouver_hBASEBOARDe_2015)'.
+Presolve time = 0.02 sec. (6.33 ticks)
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Mon Jul 11 15:36:26 2022
+
+Bound infeasibility column 'NewCapacity(Vancouver_hBASEBOARDe_2015)'.
+Presolve time = 0.01 sec. (6.33 ticks)
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Mon Jul 11 16:54:33 2022
+
+Tried aggregator 1 time.
+LP Presolve eliminated 31511 rows and 29826 columns.
+Aggregator did 2074 substitutions.
+Reduced LP has 551 rows, 724 columns, and 3350 nonzeros.
+Presolve time = 0.03 sec. (23.64 ticks)
+
+Iteration log . . .
+Iteration:     1    Scaled infeas =       5233700.840011
+Iteration:   113    Scaled infeas =        247707.357843
+Iteration:   220    Scaled infeas =             0.000098
+Switched to devex.
+Iteration:   228    Objective     =         83055.203317
+
+Dual simplex solved model.
+
+
+Log for 'pyomo_model' Clone_2 (V20.1.0.0) Mon Jul 11 17:01:45 2022
+
+Bound infeasibility column 'NewCapacity(Vancouver_hBASEBOARDe_2015)'.
+Presolve time = 0.02 sec. (6.33 ticks)
+
+Log for 'pyomo_infeasible.lp' Clone_2 (V20.1.0.0) Mon Jul 11 17:11:38 2022
+
+Bound infeasibility column 'NewCapacity(Vancouver_hBASEBOARDe_2015)'.
+Presolve time = 0.00 sec. (6.33 ticks)
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Mon Jul 11 17:20:16 2022
+
+Bound infeasibility column 'NewCapacity(Vancouver_hBASEBOARDe_2015)'.
+Presolve time = 0.00 sec. (6.34 ticks)
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Tue Jul 12 14:09:43 2022
+
+Bound infeasibility column 'NewCapacity(Vancouver_hBASEBOARDe_2015)'.
+Presolve time = 0.02 sec. (6.34 ticks)
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Tue Jul 12 16:21:27 2022
+
+Bound infeasibility column 'NewCapacity(Vancouver_hBASEBOARDe_2015)'.
+Presolve time = 0.00 sec. (6.34 ticks)
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Tue Jul 12 16:24:24 2022
+
+Bound infeasibility column 'NewCapacity(Vancouver_hBASEBOARDe_2015)'.
+Presolve time = 0.02 sec. (6.33 ticks)
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Wed Jul 13 10:37:27 2022
+
+Bound infeasibility column 'NewCapacity(Vancouver_hBASEBOARDe_2015)'.
+Presolve time = 0.00 sec. (6.33 ticks)
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Wed Jul 13 12:08:23 2022
+
+Bound infeasibility column 'NewCapacity(Vancouver_hBASEBOARDe_2015)'.
+Presolve time = 0.00 sec. (6.34 ticks)
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Wed Jul 13 12:13:23 2022
+
+Bound infeasibility column 'NewCapacity(Vancouver_hBASEBOARDe_2015)'.
+Presolve time = 0.00 sec. (6.34 ticks)
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Wed Jul 13 15:29:07 2022
+
+Bound infeasibility column 'NewCapacity(Vancouver_hBASEBOARDe_2015)'.
+Presolve time = 0.00 sec. (6.33 ticks)
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Wed Jul 13 15:31:44 2022
+
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Thu Jul 14 09:00:57 2022
+
+Bound infeasibility column 'NewCapacity(Vancouver_hBASEBOARDe_2015)'.
+Presolve time = 0.00 sec. (6.33 ticks)
+
+Log for 'pyomo_model.lp' Clone_2 (V20.1.0.0) Mon Jul 25 17:07:31 2022
+
+Tried aggregator 1 time.
+LP Presolve eliminated 38538 rows and 33884 columns.
+Aggregator did 5120 substitutions.
+Reduced LP has 1534 rows, 1215 columns, and 7993 nonzeros.
+Presolve time = 0.05 sec. (35.85 ticks)
+
+Iteration log . . .
+Iteration:     1    Scaled infeas =         12123.566552
+Iteration:   183    Scaled infeas =             1.246953
+Switched to devex.
+Iteration:   227    Objective     =        404600.241928
+Iteration:   343    Objective     =           127.853363
+Iteration:   428    Objective     =            93.548562
+Iteration:   524    Objective     =            82.651373
+Iteration:   608    Objective     =            72.913882
+
+Dual simplex solved model.
+
